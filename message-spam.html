@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Message Spam Analyzer - CyberShield</title>
+<style>
+*{box-sizing:border-box}
+:root{
+    --bg:#050b14;
+    --panel:#0a1422;
+    --panel2:#0d1a2b;
+    --border:#17304a;
+    --text:#f4f8fc;
+    --muted:#91a4b8;
+    --cyan:#00d9ff;
+    --green:#00ff9d;
+    --yellow:#ffc107;
+    --red:#ff4668;
+}
+body{
+    margin:0;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 15% 0%,rgba(0,217,255,.09),transparent 30%),
+        radial-gradient(circle at 90% 15%,rgba(0,255,157,.06),transparent 28%),
+        var(--bg);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.container{
+    width:min(960px,92%);
+    margin:0 auto;
+    padding:28px 0 55px;
+}
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:34px;
+}
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.brand-icon{
+    width:44px;height:44px;
+    display:grid;place-items:center;
+    border:1px solid rgba(0,217,255,.35);
+    border-radius:12px;
+    background:#081a29;
+}
+.brand h2{margin:0;font-size:20px}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.back{
+    color:var(--cyan);
+    text-decoration:none;
+    border:1px solid var(--border);
+    background:#091522;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:700;
+
+    outline:none;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-focus-ring-color:transparent;
+    box-shadow:none;
+}
+
+.back:focus,
+.back:active,
+.back:focus-visible{
+    outline:none !important;
+    -webkit-tap-highlight-color:transparent !important;
+    -webkit-focus-ring-color:transparent !important;
+    box-shadow:none !important;
+}
+.hero{
+    text-align:center;
+    margin-bottom:28px;
+}
+.badge{
+    display:inline-block;
+    color:var(--cyan);
+    border:1px solid rgba(0,217,255,.25);
+    background:rgba(0,217,255,.06);
+    border-radius:999px;
+    padding:7px 12px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+h1{
+    margin:16px 0 10px;
+    font-size:clamp(30px,6vw,48px);
+}
+h1 span{color:var(--cyan)}
+.hero p{
+    margin:0 auto;
+    max-width:650px;
+    color:var(--muted);
+    line-height:1.65;
+}
+.card{
+    background:linear-gradient(145deg,rgba(13,26,43,.98),rgba(7,16,27,.98));
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 18px 45px rgba(0,0,0,.22);
+}
+.label{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:10px;
+    font-size:13px;
+    font-weight:800;
+}
+.counter{color:var(--muted);font-weight:600}
+textarea{
+    width:100%;
+    min-height:190px;
+    resize:vertical;
+    border:1px solid #23405d;
+    background:#07111d;
+    color:var(--text);
+    border-radius:13px;
+    padding:15px;
+    outline:none;
+    font:15px/1.55 Arial,Helvetica,sans-serif;
+}
+textarea:focus{
+    border-color:rgba(0,217,255,.65);
+    box-shadow:0 0 0 3px rgba(0,217,255,.08);
+}
+textarea::placeholder{color:#5f7388}
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:14px;
+}
+button{
+    border:0;
+    border-radius:11px;
+    padding:12px 16px;
+    cursor:pointer;
+    font-weight:800;
+    font-size:13px;
+}
+button,
+button:focus,
+button:active,
+.example,
+.example:focus,
+.example:active {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.primary{
+    flex:1;
+    min-width:170px;
+    color:#031016;
+    background:linear-gradient(135deg,#00d9ff,#00ff9d);
+}
+.secondary{
+    color:#c8d5e2;
+    background:#0b1a2a;
+    border:1px solid #203b56;
+}
+.note{
+    margin:14px 0 0;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.55;
+}
+.result{
+    display:none;
+    margin-top:18px;
+}
+.result.show{display:block}
+.status{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    padding:18px;
+    border-radius:15px;
+    border:1px solid var(--border);
+    margin-bottom:15px;
+}
+.status-copy h2{margin:0 0 6px;font-size:21px}
+.status-copy p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.score{
+    min-width:84px;
+    text-align:center;
+    border-radius:12px;
+    padding:10px 12px;
+    font-weight:900;
+}
+.safe{border-color:rgba(0,255,157,.25);background:rgba(0,255,157,.045)}
+.safe .score{color:var(--green);border:1px solid rgba(0,255,157,.3)}
+.check{border-color:rgba(255,193,7,.25);background:rgba(255,193,7,.045)}
+.check .score{color:var(--yellow);border:1px solid rgba(255,193,7,.3)}
+.danger{border-color:rgba(255,70,104,.28);background:rgba(255,70,104,.05)}
+.danger .score{color:var(--red);border:1px solid rgba(255,70,104,.3)}
+.section-title{
+    margin:24px 0 12px;
+    font-size:16px;
+}
+.indicators{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+.indicator{
+    padding:14px;
+    border:1px solid var(--border);
+    background:#081321;
+    border-radius:12px;
+}
+.indicator strong{display:block;font-size:13px;margin-bottom:5px}
+.indicator span{color:var(--muted);font-size:12px;line-height:1.45}
+.indicator.detected{border-color:rgba(255,70,104,.28)}
+.indicator.detected strong{color:#ff6b83}
+.indicator.clear strong{color:var(--green)}
+.recommend{
+    padding:16px;
+    border:1px solid rgba(0,217,255,.18);
+    background:rgba(0,217,255,.035);
+    border-radius:13px;
+    color:#b9c9d8;
+    font-size:13px;
+    line-height:1.6;
+}
+.examples{
+    margin-top:18px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+.example{
+    padding:8px 11px;
+    border-radius:9px;
+    color:#9eb2c6;
+    background:#081321;
+    border:1px solid var(--border);
+    cursor:pointer;
+    font-size:11px;
+}
+.footer{
+    text-align:center;
+    color:#5e7388;
+    font-size:11px;
+    margin-top:28px;
+}
+@media(max-width:620px){
+    .container{padding-top:20px}
+    .header{margin-bottom:25px}
+    .back{padding:9px 11px}
+    .indicators{grid-template-columns:1fr}
+    .status{align-items:flex-start;flex-direction:column}
+    .score{min-width:100%}
+    .card{padding:16px}
+}
+</style>
+</head>
+
+<body>
+<canvas id="bgCanvas"></canvas>
+<script>
+(function(){
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height, particles;
+
+    function resize(){
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function createParticles(){
+        const count = Math.min(70, Math.floor((width*height)/18000));
+        particles = [];
+        for(let i=0;i<count;i++){
+            particles.push({
+                x: Math.random()*width,
+                y: Math.random()*height,
+                vx: (Math.random()-0.5)*0.25,
+                vy: (Math.random()-0.5)*0.25,
+                r: Math.random()*1.6+0.6
+            });
+        }
+    }
+
+    function step(){
+        ctx.clearRect(0,0,width,height);
+
+        for(let i=0;i<particles.length;i++){
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > width) p.vx *= -1;
+            if(p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = "rgba(0,217,255,0.55)";
+            ctx.fill();
+        }
+
+        for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const a = particles[i], b = particles[j];
+                const dx = a.x-b.x, dy = a.y-b.y;
+                const dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist < 130){
+                    ctx.beginPath();
+                    ctx.moveTo(a.x,a.y);
+                    ctx.lineTo(b.x,b.y);
+                    ctx.strokeStyle = "rgba(0,255,157," + (0.12*(1-dist/130)) + ")";
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    resize();
+    createParticles();
+    step();
+
+    window.addEventListener("resize", function(){
+        resize();
+        createParticles();
+    });
+})();
+</script>
+
+<div class="container">
+
+<header class="header">
+    <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 64 64" fill="none">
+                <path d="M32 7L51 14V29C51 42 43 51 32 57C21 51 13 42 13 29V14L32 7Z"
+                      stroke="#00d9ff" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M22 30H42M22 38H37" stroke="#00ff9d" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div>
+            <h2>CyberShield</h2>
+            <p>Stay Aware. Stay Secure.</p>
+        </div>
+    </div>
+    <a class="back" href="index.html">← Dashboard</a>
+</header>
+
+<section class="hero">
+    <div class="badge">MESSAGE SPAM ANALYZER</div>
+    <h1>Think Before You <span>Trust</span></h1>
+    <p>Analyze suspicious messages for common spam, scam and social-engineering warning signs before you respond or click anything.</p>
+</section>
+
+<section class="card">
+    <div class="label">
+        <span>Paste the message</span>
+        <span class="counter" id="charCount">0 / 5000</span>
+    </div>
+
+    <textarea id="messageInput" maxlength="5000"
+        placeholder="Paste a suspicious SMS, email, DM or notification here..."></textarea>
+
+    <div class="actions">
+        <button class="primary" type="button" onclick="analyzeMessage()">Analyze Message</button>
+        <button class="secondary" type="button" onclick="loadExample()">Load Demo</button>
+        <button class="secondary" type="button" onclick="clearAnalyzer()">Clear</button>
+    </div>
+
+    <p class="note">🔒 Your message is analyzed locally in this page. CyberShield does not send the message to an external service.</p>
+</section>
+
+<section class="result" id="result">
+    <div class="status" id="statusBox">
+        <div class="status-copy">
+            <h2 id="statusTitle">Analysis Result</h2>
+            <p id="statusDescription"></p>
+        </div>
+        <div class="score" id="scoreBox">0%</div>
+    </div>
+
+    <h3 class="section-title">Detected indicators</h3>
+    <div class="indicators" id="indicators"></div>
+
+    <h3 class="section-title">What you should do</h3>
+    <div class="recommend" id="recommendation"></div>
+
+    <div class="examples">
+        <button class="example" type="button" onclick="loadSafeExample()">Try safe example</button>
+        <button class="example" type="button" onclick="loadScamExample()">Try suspicious example</button>
+    </div>
+</section>
+
+<div class="footer">CyberShield Message Spam Analyzer • Local heuristic analysis</div>
+
+</div>
+
+<script>
+const input = document.getElementById('messageInput');
+const charCount = document.getElementById('charCount');
+
+input.addEventListener('input', function(){
+    charCount.textContent = input.value.length + ' / 5000';
+});
+
+function loadExample(){
+    input.value =
+        'URGENT! Your account will be suspended today. Verify your account now and claim your reward. Click this link to continue.';
+    charCount.textContent = input.value.length + ' / 5000';
+    analyzeMessage();
+}
+
+function loadSafeExample(){
+    input.value =
+        'Hi Rahul, your school meeting is scheduled for Monday at 9:00 AM. Please bring your project file.';
+    charCount.textContent = input.value.length + ' / 5000';
+    analyzeMessage();
+}
+
+function loadScamExample(){
+    input.value =
+        'URGENT: Your payment failed. Verify your account immediately to avoid suspension. Click the link below and enter your password.';
+    charCount.textContent = input.value.length + ' / 5000';
+    analyzeMessage();
+}
+
+function clearAnalyzer(){
+    input.value = '';
+    charCount.textContent = '0 / 5000';
+    document.getElementById('result').classList.remove('show');
+    input.focus();
+}
+
+function analyzeMessage(){
+    const text = input.value.trim();
+
+    if(!text){
+        alert('Please paste a message first.');
+        input.focus();
+        return;
+    }
+
+    const lower = text.toLowerCase();
+    let score = 0;
+    const found = [];
+
+    const rules = [
+        {
+            name:'Urgency or pressure',
+            desc:'Tries to make you act immediately.',
+            regex:/\b(urgent|immediately|right away|act now|final notice|last chance|expires today|within \d+\s*(minutes?|hours?))\b/i,
+            points:20
+        },
+        {
+            name:'Money or payment request',
+            desc:'Mentions payments, prizes, refunds or money.',
+            regex:/\b(payment|pay|paid|money|cash|prize|reward|refund|transfer|fee|invoice|gift card|bank)\b/i,
+            points:20
+        },
+        {
+            name:'Credential or account pressure',
+            desc:'Requests passwords, verification or account access.',
+            regex:/\b(password|passcode|otp|one[- ]time code|verify your account|confirm your account|account suspended|account locked|login|sign in|credentials)\b/i,
+            points:25
+        },
+        {
+            name:'Suspicious action request',
+            desc:'Pushes you to click, tap, reply or call.',
+            regex:/\b(click|tap|reply|respond|call|contact|open|follow this link|visit this link)\b/i,
+            points:15
+        },
+        {
+            name:'Download or installation request',
+            desc:'Asks you to download or install something.',
+            regex:/\b(download|install|apk|application|app file|attachment)\b/i,
+            points:20
+        },
+        {
+            name:'Prize or unexpected offer',
+            desc:'Claims you won something or received an unexpected benefit.',
+            regex:/\b(congratulations|you won|winner|selected|free|bonus|claim your|lucky)\b/i,
+            points:15
+        },
+        {
+            name:'Suspicious link',
+            desc:'Contains a web link that deserves extra caution.',
+            regex:/(https?:\/\/|www\.|bit\.ly\/|tinyurl\.com\/|t\.co\/)/i,
+            points:15
+        }
+    ];
+
+    rules.forEach(rule => {
+        if(rule.regex.test(text)){
+            score += rule.points;
+            found.push(rule);
+        }
+    });
+
+    const combo =
+        found.some(x => x.name === 'Urgency or pressure') &&
+        (
+            found.some(x => x.name === 'Money or payment request') ||
+            found.some(x => x.name === 'Credential or account pressure') ||
+            found.some(x => x.name === 'Download or installation request')
+        );
+
+    if(combo){
+        score += 15;
+    }
+
+    score = Math.min(100, score);
+
+    let level, title, description, className, recommendation;
+
+    if(score >= 60){
+        level = 'SUSPICIOUS';
+        title = '⚠️ Suspicious message';
+        description = 'Several warning signs were detected. Treat this message with caution.';
+        className = 'danger';
+        recommendation =
+            '<strong>Do not click links, download files, share passwords/OTP codes, or send money.</strong> ' +
+            'Verify the sender through an official channel you already trust.';
+    }else if(score >= 30){
+        level = 'CHECK';
+        title = '🔎 Needs caution';
+        description = 'Some warning signs were detected, but the message is not automatically confirmed as spam.';
+        className = 'check';
+        recommendation =
+            '<strong>Pause before acting.</strong> Check who sent the message and verify important requests independently.';
+    }else{
+        level = 'LIKELY SAFE';
+        title = '✓ No major warning signs';
+        description = 'This message did not trigger many of CyberShield’s local warning rules.';
+        className = 'safe';
+        recommendation =
+            '<strong>No obvious spam indicators were detected.</strong> Still verify unexpected requests and remember that this tool cannot guarantee a message is safe.';
+    }
+
+    const statusBox = document.getElementById('statusBox');
+    statusBox.className = 'status ' + className;
+
+    document.getElementById('statusTitle').textContent = title;
+    document.getElementById('statusDescription').textContent =
+        description + ' Detection level: ' + level + '.';
+    document.getElementById('scoreBox').textContent = score + '%';
+    document.getElementById('recommendation').innerHTML = recommendation;
+
+    const indicators = document.getElementById('indicators');
+    indicators.innerHTML = '';
+
+    rules.forEach(rule => {
+        const detected = found.includes(rule);
+        const div = document.createElement('div');
+        div.className = 'indicator ' + (detected ? 'detected' : 'clear');
+        div.innerHTML =
+            '<strong>' + (detected ? '⚠ ' : '✓ ') + rule.name + '</strong>' +
+            '<span>' + (detected ? rule.desc : 'No matching pattern detected.') + '</span>';
+        indicators.appendChild(div);
+    });
+
+    if(combo){
+        const div = document.createElement('div');
+        div.className = 'indicator detected';
+        div.innerHTML =
+            '<strong>⚠ Multiple high-risk signals</strong>' +
+            '<span>Urgency is combined with another sensitive request.</span>';
+        indicators.appendChild(div);
+    }
+
+    document.getElementById('result').classList.add('show');
+    document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+
+<style id="cybershield-svg-ui">
+/* Tool/title cards glow when the pointer touches them. */
+.card:hover{
+    border-color:rgba(0,217,255,.72) !important;
+    box-shadow:
+        0 0 0 1px rgba(0,217,255,.18),
+        0 0 28px rgba(0,217,255,.16),
+        0 18px 45px rgba(0,0,0,.28) !important;
+    transform:translateY(-2px);
+    transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+@media (hover:none){
+    .card:hover{transform:none}
+}
+
+/* Inline SVG replacement for UI emoji/icons. */
+.cs-svg-icon{
+    width:1.15em;
+    height:1.15em;
+    display:inline-block;
+    vertical-align:-.18em;
+    flex:0 0 auto;
+}
+.cs-svg-icon svg{
+    width:100%;
+    height:100%;
+    display:block;
+}
+</style>
+<script>
+(function(){
+    const ICONS = {
+        "🛡":"shield","⚠":"warning","🔗":"link","🚨":"alert","✓":"check",
+        "🔎":"search","🔒":"lock","🔐":"lock","🚫":"blocked","🧩":"puzzle",
+        "♻":"recycle","📁":"folder","📄":"file","📊":"chart","📖":"book",
+        "🔍":"search","✕":"x","✔":"check","❌":"x","🟡":"dot"
+    };
+
+    function svgFor(name){
+        const common = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+        const paths = {
+            shield:'<path '+common+' d="M12 3l7 3v5c0 4.7-2.8 7.8-7 10-4.2-2.2-7-5.3-7-10V6l7-3z"/><path '+common+' d="M9 12l2 2 4-4"/>',
+            warning:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            link:'<path '+common+' d="M10 13.5l4-4"/><path '+common+' d="M8.5 16H7a4 4 0 010-8h3"/><path '+common+' d="M15.5 8H17a4 4 0 010 8h-3"/>',
+            alert:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            check:'<path '+common+' d="M5 12l4 4L19 6"/>',
+            search:'<circle '+common+' cx="10.5" cy="10.5" r="6.5"/><path '+common+' d="M16 16l5 5"/>',
+            lock:'<rect '+common+' x="5" y="10" width="14" height="10" rx="2"/><path '+common+' d="M8 10V7a4 4 0 018 0v3"/>',
+            blocked:'<circle '+common+' cx="12" cy="12" r="8"/><path '+common+' d="M7 7l10 10"/>',
+            puzzle:'<path '+common+' d="M9 5h3a2 2 0 114 0v1h3v5a2 2 0 110 4v4h-5a2 2 0 110-4H9v-3a2 2 0 110-4V5z"/>',
+            recycle:'<path '+common+' d="M8 7l2-3 3 1"/><path '+common+' d="M10 4l2 4H8"/><path '+common+' d="M17 9l3 2-1 3"/><path '+common+' d="M20 11l-5 1 2-4"/><path '+common+' d="M8 17l-1 3-3-1"/><path '+common+' d="M7 20l3-4 2 4"/>',
+            folder:'<path '+common+' d="M3 7h7l2 2h9v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+            file:'<path '+common+' d="M6 3h8l4 4v14H6z"/><path '+common+' d="M14 3v5h5"/>',
+            chart:'<path '+common+' d="M5 19V9M12 19V5M19 19v-7"/><path '+common+' d="M3 21h18"/>',
+            book:'<path '+common+' d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4V4z"/><path '+common+' d="M9 20V8a4 4 0 014-4"/>',
+            x:'<path '+common+' d="M6 6l12 12M18 6L6 18"/>',
+            dot:'<circle cx="12" cy="12" r="5" fill="currentColor"/>'
+        };
+        return '<span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(paths[name]||paths.shield)+'</svg></span>';
+    }
+
+    function replaceTextNode(node){
+        if(!node.nodeValue || !/[🛡⚠🔗🚨✓🔎🔒🔐🚫🧩♻📁📄📊📖🔍✕✔❌🟡]/u.test(node.nodeValue)) return;
+        const parent=node.parentNode;
+        if(!parent || /^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(parent.nodeName)) return;
+
+        const text=node.nodeValue;
+        const frag=document.createDocumentFragment();
+        let last=0;
+        const re=/🛡|⚠|🔗|🚨|✓|🔎|🔒|🔐|🚫|🧩|♻|📁|📄|📊|📖|🔍|✕|✔|❌|🟡/gu;
+        let m;
+        while((m=re.exec(text))){
+            if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+            const holder=document.createElement("span");
+            holder.innerHTML=svgFor(ICONS[m[0]]);
+            frag.appendChild(holder.firstElementChild);
+            last=re.lastIndex;
+        }
+        if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        parent.replaceChild(frag,node);
+    }
+
+    function scan(root){
+        const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+            acceptNode:function(n){
+                const p=n.parentNode;
+                return p && !/^(SCRIPT|STYLE)$/i.test(p.nodeName)
+                    ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        });
+        const nodes=[];
+        let n;
+        while((n=walker.nextNode())) nodes.push(n);
+        nodes.forEach(replaceTextNode);
+    }
+
+    function init(){
+        scan(document.body);
+        const observer=new MutationObserver(function(records){
+            records.forEach(function(record){
+                record.addedNodes.forEach(function(node){
+                    if(node.nodeType===Node.TEXT_NODE) replaceTextNode(node);
+                    else if(node.nodeType===Node.ELEMENT_NODE) scan(node);
+                });
+            });
+        });
+        observer.observe(document.body,{childList:true,subtree:true});
+    }
+
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+    else init();
+})();
+</script>
+
+</body>
+</html>

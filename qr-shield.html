@@ -1,0 +1,1090 @@
+<!doctype html>
+
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Shield • CyberShield</title><style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#020914;
+    color:#f5f7fa;
+    font-family:Segoe UI,Arial,sans-serif;
+}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+.wrap{
+    max-width:850px;
+    margin:auto;
+    padding:0 20px 50px;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 0;
+    border-bottom:1px solid #17283a;
+}
+
+.logo{
+    font-size:27px;
+    font-weight:800;
+}
+
+.logo span{
+    color:#00ff9d;
+}
+
+.small{
+    color:#7f8da0;
+    font-size:13px;
+}
+
+.hero{
+    text-align:center;
+    padding:45px 10px 30px;
+}
+
+.badge{
+    display:inline-block;
+    border:1px solid #00d9ff;
+    color:#00d9ff;
+    border-radius:30px;
+    padding:9px 17px;
+    font-weight:700;
+    font-size:13px;
+}
+
+h1{
+    font-size:43px;
+    line-height:1.1;
+    margin:20px 0 14px;
+}
+
+h1 span{
+    color:#00d9ff;
+}
+
+p{
+    color:#9eacbf;
+    line-height:1.7;
+}
+
+.card{
+    background:#071321;
+    border:1px solid #193047;
+    border-radius:20px;
+    padding:28px;
+    text-align:center;
+    margin-top:20px;
+}
+
+.icon{
+    font-size:50px;
+    margin-bottom:10px;
+}
+
+.btn{
+    display:inline-block;
+    margin-top:16px;
+    padding:13px 20px;
+    border-radius:10px;
+    background:#00ff9d;
+    color:#00130b;
+    font-weight:800;
+    border:0;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.btn.secondary{
+    background:#102237;
+    color:#00d9ff;
+    border:1px solid #00d9ff;
+}
+
+.btn:focus,
+.btn:active{
+    outline:none;
+    -webkit-tap-highlight-color:transparent;
+}
+
+input[type="file"]{
+    display:none;
+}
+
+.preview{
+    display:none;
+    margin:22px auto 5px;
+    max-width:100%;
+    max-height:320px;
+    border-radius:14px;
+    border:1px solid #294158;
+}
+
+.status{
+    display:none;
+    margin-top:20px;
+    padding:18px;
+    border-radius:14px;
+    text-align:left;
+    background:#020914;
+    border:1px solid #193047;
+}
+
+.status.show{
+    display:block;
+}
+
+.status.safe{
+    border-color:#00ff9d;
+}
+
+.status.warn{
+    border-color:#ffcc00;
+}
+
+.status.bad{
+    border-color:#ff4d6d;
+}
+
+.status-title{
+    font-size:22px;
+    font-weight:900;
+    margin-bottom:8px;
+}
+
+.safe .status-title{
+    color:#00ff9d;
+}
+
+.warn .status-title{
+    color:#ffcc00;
+}
+
+.bad .status-title{
+    color:#ff4d6d;
+}
+
+.destination{
+    margin-top:15px;
+    padding:14px;
+    background:#071321;
+    border:1px solid #193047;
+    border-radius:10px;
+    word-break:break-all;
+    color:#e7edf5;
+    font-size:14px;
+}
+
+.reason{
+    margin-top:12px;
+    color:#9eacbf;
+    line-height:1.6;
+    font-size:13px;
+}
+
+.check-list{
+    margin-top:15px;
+}
+
+.check-item{
+    padding:10px 0;
+    border-bottom:1px solid #17283a;
+    font-size:13px;
+    color:#b7c2d0;
+}
+
+.check-item:last-child{
+    border-bottom:0;
+}
+
+.action-area{
+    display:none;
+    margin-top:15px;
+}
+
+.notice{
+    margin-top:20px;
+    padding:14px;
+    border-radius:10px;
+    background:#020914;
+    border:1px solid #193047;
+    color:#718095;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.error{
+    color:#ff4d6d;
+}
+
+.loading{
+    color:#00d9ff;
+}
+
+@media(max-width:600px){
+    h1{
+        font-size:36px;
+    }
+
+    .top{
+        align-items:flex-start;
+    }
+
+    .logo{
+        font-size:22px;
+    }
+
+    .small{
+        font-size:11px;
+    }
+
+    .card{
+        padding:22px;
+    }
+}
+</style></head>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script><body>
+<canvas id="bgCanvas"></canvas>
+<script>
+(function(){
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height, particles;
+
+    function resize(){
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function createParticles(){
+        const count = Math.min(70, Math.floor((width*height)/18000));
+        particles = [];
+        for(let i=0;i<count;i++){
+            particles.push({
+                x: Math.random()*width,
+                y: Math.random()*height,
+                vx: (Math.random()-0.5)*0.25,
+                vy: (Math.random()-0.5)*0.25,
+                r: Math.random()*1.6+0.6
+            });
+        }
+    }
+
+    function step(){
+        ctx.clearRect(0,0,width,height);
+
+        for(let i=0;i<particles.length;i++){
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > width) p.vx *= -1;
+            if(p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = "rgba(0,217,255,0.55)";
+            ctx.fill();
+        }
+
+        for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const a = particles[i], b = particles[j];
+                const dx = a.x-b.x, dy = a.y-b.y;
+                const dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist < 130){
+                    ctx.beginPath();
+                    ctx.moveTo(a.x,a.y);
+                    ctx.lineTo(b.x,b.y);
+                    ctx.strokeStyle = "rgba(0,255,157," + (0.12*(1-dist/130)) + ")";
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    resize();
+    createParticles();
+    step();
+
+    window.addEventListener("resize", function(){
+        resize();
+        createParticles();
+    });
+})();
+</script>
+<div class="wrap"><div class="top">
+    <div class="logo">🛡️ Cyber<span>Shield</span></div>
+    <div class="small">QR SHIELD</div>
+</div><section class="hero"><div class="badge">QR CODE PROTECTION</div>
+<h1>Scan Before You <span>Trust</span></h1>
+
+<p>
+    Upload a QR-code image and CyberShield will inspect its
+    destination before you open it.
+</p>
+
+</section><div class="card"><div class="icon">
+<svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+
+<rect x="9" y="9" width="16" height="16" rx="2" stroke="#00d9ff" stroke-width="3"/>
+<rect x="14" y="14" width="6" height="6" fill="#00ff9d"/>
+
+<rect x="39" y="9" width="16" height="16" rx="2" stroke="#00d9ff" stroke-width="3"/>
+<rect x="44" y="14" width="6" height="6" fill="#00ff9d"/>
+
+<rect x="9" y="39" width="16" height="16" rx="2" stroke="#00d9ff" stroke-width="3"/>
+<rect x="14" y="44" width="6" height="6" fill="#00ff9d"/>
+
+<rect x="39" y="39" width="6" height="6" fill="#00ff9d"/>
+<rect x="49" y="39" width="6" height="6" fill="#00d9ff"/>
+<rect x="39" y="49" width="6" height="6" fill="#00d9ff"/>
+<rect x="49" y="49" width="6" height="6" fill="#00ff9d"/>
+
+<path d="M32 27L38 30V35C38 40 35 43 32 45C29 43 26 40 26 35V30L32 27Z"
+      stroke="#00ff9d"
+      stroke-width="2.5"
+      stroke-linejoin="round"/>
+
+<path d="M29 35L31 37L35 32"
+      stroke="#00ff9d"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+
+</svg>
+</div>
+
+<h2>QR Shield</h2>
+
+<p>
+    Select a QR-code photo or screenshot from your device.
+    The QR destination will be analyzed locally.
+</p>
+
+<label class="btn" for="qrFile">
+    Choose QR Image
+</label>
+
+<input
+    id="qrFile"
+    type="file"
+    accept="image/*"
+>
+
+<img
+    id="preview"
+    class="preview"
+    alt="Selected QR image"
+>
+
+<div id="scanStatus" class="status"></div>
+
+<div id="actionArea" class="action-area">
+
+    <button
+        id="openButton"
+        class="btn"
+        type="button"
+        onclick="openDestination()"
+    >
+        Open Link
+    </button>
+
+    <button
+        class="btn secondary"
+        type="button"
+        onclick="resetScanner()"
+    >
+        Scan Another
+    </button>
+
+</div>
+
+<div class="notice">
+    🛡️ CyberShield does not automatically open QR destinations.
+    The destination is analyzed first so you can decide whether
+    to continue.
+</div>
+
+</div></div><script>
+
+let decodedUrl = '';
+
+const fileInput =
+    document.getElementById('qrFile');
+
+const preview =
+    document.getElementById('preview');
+
+const scanStatus =
+    document.getElementById('scanStatus');
+
+const actionArea =
+    document.getElementById('actionArea');
+
+
+fileInput.addEventListener(
+    'change',
+    handleImage
+);
+
+
+async function handleImage(){
+
+    const file =
+        fileInput.files &&
+        fileInput.files[0];
+
+    if(!file){
+        return;
+    }
+
+    decodedUrl = '';
+
+    actionArea.style.display='none';
+
+    preview.style.display='block';
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    showStatus(
+        'loading',
+        '🔍 Reading QR code...',
+        'CyberShield is processing the selected image locally.'
+    );
+
+    try{
+
+        if(
+            typeof jsQR !== 'function'
+        ){
+
+            throw new Error(
+                'QR decoding library failed to load. Check your internet connection and try again.'
+            );
+        }
+
+        const image =
+            await createImageBitmap(file);
+
+        const canvas =
+            document.createElement('canvas');
+
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const canvasCtx =
+            canvas.getContext('2d');
+
+        canvasCtx.drawImage(image, 0, 0);
+
+        const imageData =
+            canvasCtx.getImageData(
+                0, 0,
+                canvas.width,
+                canvas.height
+            );
+
+        image.close();
+
+        const result =
+            jsQR(
+                imageData.data,
+                imageData.width,
+                imageData.height
+            );
+
+        if(!result || !result.data){
+
+            showStatus(
+                'bad',
+                '❌ QR Code Not Found',
+                'No readable QR code was detected in this image. Try a clearer photo or screenshot.'
+            );
+
+            return;
+        }
+
+        const value =
+            String(
+                result.data || ''
+            ).trim();
+
+        if(!value){
+
+            showStatus(
+                'bad',
+                '❌ QR Code Could Not Be Read',
+                'The QR code was detected, but its contents could not be extracted.'
+            );
+
+            return;
+        }
+
+        decodedUrl = value;
+
+        analyzeQR(value);
+
+    }catch(error){
+
+        console.error(error);
+
+        showStatus(
+            'bad',
+            '⚠️ QR Scan Unavailable',
+            error.message ||
+            'CyberShield could not read this QR image.'
+        );
+    }
+}
+
+
+function analyzeQR(value){
+
+    const trimmed =
+        value.trim();
+
+    /*
+     * QR codes can contain things other than URLs.
+     * Only run URL security analysis when the
+     * decoded content is a web address.
+     */
+
+    let url = trimmed;
+
+    if(
+        !/^https?:\/\//i.test(url)
+    ){
+
+        if(
+            /^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i
+            .test(url)
+        ){
+            url =
+                'https://' + url;
+        }else{
+
+            showStatus(
+                'warn',
+                '🟡 QR Code Contains Text',
+                'This QR code does not contain a normal web address. Review its contents carefully before using it.'
+            );
+
+            showDestination(trimmed);
+
+            return;
+        }
+    }
+
+    let status =
+        'APPEARS SAFE';
+
+    let reason =
+        'No obvious URL red flags were detected. HTTPS alone does not prove that a website is trustworthy.';
+
+    let checks = [];
+
+    try{
+
+        const parsed =
+            new URL(url);
+
+        const host =
+            parsed.hostname.toLowerCase();
+
+        checks.push(
+            parsed.protocol === 'https:'
+            ? '✓ HTTPS connection detected'
+            : '⚠️ HTTP connection detected'
+        );
+
+        if(host.includes('xn--')){
+
+            status='SUSPICIOUS';
+
+            reason=
+                'A punycode domain was detected. Lookalike domains can use this technique to resemble legitimate websites.';
+
+            checks.push(
+                '🚨 Punycode domain detected'
+            );
+
+        }
+
+        else if(
+            /^(\d{1,3}\.){3}\d{1,3}$/.test(host)
+        ){
+
+            status='SUSPICIOUS';
+
+            reason=
+                'The QR code points directly to an IP address instead of a normal domain.';
+
+            checks.push(
+                '🚨 Raw IP address used'
+            );
+
+        }
+
+        else if(url.includes('@')){
+
+            status='SUSPICIOUS';
+
+            reason=
+                'The @ character can make a URL misleading by hiding the actual destination.';
+
+            checks.push(
+                '🚨 @ character detected'
+            );
+
+        }
+
+        else if(
+            parsed.port &&
+            parsed.port!=='80' &&
+            parsed.port!=='443'
+        ){
+
+            status='CHECK';
+
+            reason=
+                'The destination uses an unusual port. Verify the website carefully before continuing.';
+
+            checks.push(
+                '⚠️ Unusual port detected'
+            );
+
+        }
+
+        else if(
+            host.split('.').length>=5
+        ){
+
+            status='CHECK';
+
+            reason=
+                'The domain contains many subdomains. Verify which organization actually owns the main domain.';
+
+            checks.push(
+                '⚠️ Many subdomains detected'
+            );
+
+        }
+
+        else if(
+            /%2f|%2e|%40|%3a/i.test(url)
+        ){
+
+            status='CHECK';
+
+            reason=
+                'Encoded URL characters were detected. Inspect the destination carefully.';
+
+            checks.push(
+                '⚠️ Encoded URL characters detected'
+            );
+
+        }
+
+        else if(
+            /login|log-in|signin|sign-in|verify|verification|account|password|security|wallet|payment/i
+            .test(url)
+        ){
+
+            status='CHECK';
+
+            reason=
+                'The destination contains security-sensitive keywords. Verify the website before entering personal information.';
+
+            checks.push(
+                '⚠️ Security-sensitive keywords detected'
+            );
+
+        }
+
+        else if(
+            parsed.protocol==='http:'
+        ){
+
+            status='CHECK';
+
+            reason=
+                'The QR code leads to an HTTP website instead of HTTPS. Treat unknown destinations cautiously.';
+
+            checks.push(
+                '⚠️ HTTPS not enabled'
+            );
+
+        }
+
+        else{
+
+            checks.push(
+                '✓ No obvious URL structure red flags detected'
+            );
+        }
+
+    }catch(error){
+
+        status='SUSPICIOUS';
+
+        reason=
+            'The QR code contains something that could not be parsed as a normal web address.';
+
+        checks.push(
+            '🚨 Invalid web address'
+        );
+    }
+
+    showResult(
+        url,
+        status,
+        reason,
+        checks
+    );
+}
+
+
+function showResult(
+    url,
+    status,
+    reason,
+    checks
+){
+
+    let type='safe';
+
+    if(status==='CHECK'){
+        type='warn';
+    }
+
+    if(status==='SUSPICIOUS'){
+        type='bad';
+    }
+
+    const icon =
+        status==='SUSPICIOUS'
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="9" stroke="#ff4d5a" stroke-width="2.5"/><path d="M8 8L16 16M16 8L8 16" stroke="#ff4d5a" stroke-width="2.5" stroke-linecap="round"/></svg>'
+        : status==='CHECK'
+        ? '⚠️'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;"><circle cx="12" cy="12" r="9" stroke="#00ff9d" stroke-width="2.5"/><path d="M7.5 12.2L10.5 15.2L16.5 8.8" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    let html =
+        '<div class="status-title">'+
+        icon+' '+escapeHtml(status)+
+        '</div>';
+
+    html +=
+        '<div class="reason">'+
+        escapeHtml(reason)+
+        '</div>';
+
+    html +=
+        '<div class="destination">'+
+        '<strong>QR Destination</strong><br><br>'+
+        escapeHtml(url)+
+        '</div>';
+
+    html +=
+        '<div class="check-list">';
+
+    checks.forEach(function(item){
+
+        html +=
+            '<div class="check-item">'+
+            escapeHtml(item)+
+            '</div>';
+
+    });
+
+    html += '</div>';
+
+    if(status==='SUSPICIOUS'){
+
+    html +=
+        '<div class="reason">'+
+        '🚫 <strong>Access Restricted.</strong><br><br>'+
+        'Our users’ safety is important to us. '+
+        'CyberShield has blocked access to this destination because it was identified as potentially unsafe.'+
+        '</div>';
+
+}
+
+    else if(status==='CHECK'){
+
+        html +=
+            '<div class="reason">'+
+            '⚠️ <strong>Recommendation:</strong> '+
+            'Verify the destination before entering passwords, OTPs, payment details, or other sensitive information.'+
+            '</div>';
+
+    }
+
+    else{
+
+        html +=
+            '<div class="reason">'+
+            '🛡️ <strong>Remember:</strong> '+
+            'A technically normal URL is not proof that the website itself is trustworthy.'+
+            '</div>';
+    }
+
+    showStatus(
+        type,
+        '',
+        html,
+        true
+    );
+
+    actionArea.style.display='block';
+
+    const openButton =
+        document.getElementById('openButton');
+
+    if(openButton){
+
+    if(status==='SUSPICIOUS'){
+
+        openButton.style.display='none';
+
+    }else{
+
+        openButton.style.display='inline-block';
+
+        openButton.disabled=false;
+
+        openButton.textContent=
+            'Open Link';
+
+        openButton.style.opacity='1';
+    }
+}
+}
+
+
+function showDestination(value){
+
+    const html =
+        '<div class="status-title">'+
+        '🟡 QR Content'+
+        '</div>'+
+        '<div class="destination">'+
+        escapeHtml(value)+
+        '</div>'+
+        '<div class="reason">'+
+        'Review this content carefully before using it.'+
+        '</div>';
+
+    showStatus(
+        'warn',
+        '',
+        html,
+        true
+    );
+
+    actionArea.style.display='none';
+}
+
+
+function showStatus(
+    type,
+    title,
+    message,
+    rawHtml=false
+){
+
+    scanStatus.className =
+        'status show '+type;
+
+    if(rawHtml){
+
+        scanStatus.innerHTML =
+            message;
+
+        return;
+    }
+
+    scanStatus.innerHTML =
+        '<div class="status-title">'+
+        escapeHtml(title)+
+        '</div>'+
+        '<div class="reason">'+
+        escapeHtml(message)+
+        '</div>';
+}
+
+
+function openDestination(){
+    if(!decodedUrl){
+        return;
+    }
+
+    if(!/^https?:\/\//i.test(decodedUrl)){
+        alert('This QR code does not contain a normal web link.');
+        return;
+    }
+
+    if(
+        window.CyberShieldAndroid &&
+        typeof window.CyberShieldAndroid.openExternalUrl === 'function'
+    ){
+        window.CyberShieldAndroid.openExternalUrl(decodedUrl);
+    }else{
+        window.open(decodedUrl,'_blank');
+    }
+}
+
+function resetScanner(){
+
+    decodedUrl='';
+
+    fileInput.value='';
+
+    preview.style.display='none';
+
+    preview.removeAttribute('src');
+
+    actionArea.style.display='none';
+
+    scanStatus.className='status';
+
+    scanStatus.innerHTML='';
+}
+
+
+function escapeHtml(text){
+
+    return String(text || '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+}
+
+</script>
+<style id="cybershield-svg-ui">
+/* Tool/title cards glow when the pointer touches them. */
+.card:hover{
+    border-color:rgba(0,217,255,.72) !important;
+    box-shadow:
+        0 0 0 1px rgba(0,217,255,.18),
+        0 0 28px rgba(0,217,255,.16),
+        0 18px 45px rgba(0,0,0,.28) !important;
+    transform:translateY(-2px);
+    transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+@media (hover:none){
+    .card:hover{transform:none}
+}
+
+/* Inline SVG replacement for UI emoji/icons. */
+.cs-svg-icon{
+    width:1.15em;
+    height:1.15em;
+    display:inline-block;
+    vertical-align:-.18em;
+    flex:0 0 auto;
+}
+.cs-svg-icon svg{
+    width:100%;
+    height:100%;
+    display:block;
+}
+</style>
+<script>
+(function(){
+    const ICONS = {
+        "🛡":"shield","⚠":"warning","🔗":"link","🚨":"alert","✓":"check",
+        "🔎":"search","🔒":"lock","🔐":"lock","🚫":"blocked","🧩":"puzzle",
+        "♻":"recycle","📁":"folder","📄":"file","📊":"chart","📖":"book",
+        "🔍":"search","✕":"x","✔":"check","❌":"x","🟡":"dot"
+    };
+
+    function svgFor(name){
+        const common = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+        const paths = {
+            shield:'<path '+common+' d="M12 3l7 3v5c0 4.7-2.8 7.8-7 10-4.2-2.2-7-5.3-7-10V6l7-3z"/><path '+common+' d="M9 12l2 2 4-4"/>',
+            warning:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            link:'<path '+common+' d="M10 13.5l4-4"/><path '+common+' d="M8.5 16H7a4 4 0 010-8h3"/><path '+common+' d="M15.5 8H17a4 4 0 010 8h-3"/>',
+            alert:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            check:'<path '+common+' d="M5 12l4 4L19 6"/>',
+            search:'<circle '+common+' cx="10.5" cy="10.5" r="6.5"/><path '+common+' d="M16 16l5 5"/>',
+            lock:'<rect '+common+' x="5" y="10" width="14" height="10" rx="2"/><path '+common+' d="M8 10V7a4 4 0 018 0v3"/>',
+            blocked:'<circle '+common+' cx="12" cy="12" r="8"/><path '+common+' d="M7 7l10 10"/>',
+            puzzle:'<path '+common+' d="M9 5h3a2 2 0 114 0v1h3v5a2 2 0 110 4v4h-5a2 2 0 110-4H9v-3a2 2 0 110-4V5z"/>',
+            recycle:'<path '+common+' d="M8 7l2-3 3 1"/><path '+common+' d="M10 4l2 4H8"/><path '+common+' d="M17 9l3 2-1 3"/><path '+common+' d="M20 11l-5 1 2-4"/><path '+common+' d="M8 17l-1 3-3-1"/><path '+common+' d="M7 20l3-4 2 4"/>',
+            folder:'<path '+common+' d="M3 7h7l2 2h9v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+            file:'<path '+common+' d="M6 3h8l4 4v14H6z"/><path '+common+' d="M14 3v5h5"/>',
+            chart:'<path '+common+' d="M5 19V9M12 19V5M19 19v-7"/><path '+common+' d="M3 21h18"/>',
+            book:'<path '+common+' d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4V4z"/><path '+common+' d="M9 20V8a4 4 0 014-4"/>',
+            x:'<path '+common+' d="M6 6l12 12M18 6L6 18"/>',
+            dot:'<circle cx="12" cy="12" r="5" fill="currentColor"/>'
+        };
+        return '<span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(paths[name]||paths.shield)+'</svg></span>';
+    }
+
+    function replaceTextNode(node){
+        if(!node.nodeValue || !/[🛡⚠🔗🚨✓🔎🔒🔐🚫🧩♻📁📄📊📖🔍✕✔❌🟡]/u.test(node.nodeValue)) return;
+        const parent=node.parentNode;
+        if(!parent || /^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(parent.nodeName)) return;
+
+        const text=node.nodeValue;
+        const frag=document.createDocumentFragment();
+        let last=0;
+        const re=/🛡|⚠|🔗|🚨|✓|🔎|🔒|🔐|🚫|🧩|♻|📁|📄|📊|📖|🔍|✕|✔|❌|🟡/gu;
+        let m;
+        while((m=re.exec(text))){
+            if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+            const holder=document.createElement("span");
+            holder.innerHTML=svgFor(ICONS[m[0]]);
+            frag.appendChild(holder.firstElementChild);
+            last=re.lastIndex;
+        }
+        if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        parent.replaceChild(frag,node);
+    }
+
+    function scan(root){
+        const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+            acceptNode:function(n){
+                const p=n.parentNode;
+                return p && !/^(SCRIPT|STYLE)$/i.test(p.nodeName)
+                    ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        });
+        const nodes=[];
+        let n;
+        while((n=walker.nextNode())) nodes.push(n);
+        nodes.forEach(replaceTextNode);
+    }
+
+    function init(){
+        scan(document.body);
+        const observer=new MutationObserver(function(records){
+            records.forEach(function(record){
+                record.addedNodes.forEach(function(node){
+                    if(node.nodeType===Node.TEXT_NODE) replaceTextNode(node);
+                    else if(node.nodeType===Node.ELEMENT_NODE) scan(node);
+                });
+            });
+        });
+        observer.observe(document.body,{childList:true,subtree:true});
+    }
+
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+    else init();
+})();
+</script>
+
+</body>
+</html>

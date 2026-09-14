@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050807">
+<title>RATGuard - CyberShield</title>
+
+<!-- ZIP reader -->
+<script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.7.57/dist/zip-full.min.js"></script>
+
+<style>*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --green:#00ff9d;
+    --cyan:#00d9ff;
+    --bg:#020914;
+    --panel:#071321;
+    --panel2:#091827;
+    --border:#193047;
+    --muted:#8194a8;
+    --text:#f5f7fa;
+}
+
+body{
+    font-family:Segoe UI,Arial,sans-serif;
+    background:
+        radial-gradient(circle at 50% -10%,rgba(0,255,157,.10),transparent 32%),
+        radial-gradient(circle at 90% 30%,rgba(0,217,255,.06),transparent 28%),
+        #020914;
+    color:var(--text);
+    min-height:100vh;
+}
+
+/* NAVBAR */
+
+nav{
+    height:64px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 6%;
+    background:rgba(2,9,20,.92);
+    border-bottom:1px solid rgba(0,217,255,.16);
+    backdrop-filter:blur(16px);
+}
+
+.logo{
+    color:var(--green);
+    font-weight:800;
+    font-size:20px;
+    letter-spacing:.5px;
+    text-shadow:0 0 18px rgba(0,255,157,.22);
+}
+
+.nav-links{
+    display:flex;
+    gap:20px;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:#9eacbf;
+    font-size:13px;
+    transition:.25s;
+}
+
+.nav-links a:hover{
+    color:var(--green);
+    text-shadow:0 0 12px rgba(0,255,157,.35);
+}
+
+/* HERO */
+
+.hero{
+    text-align:center;
+    padding:65px 20px 38px;
+}
+
+.badge{
+    display:inline-block;
+    color:var(--cyan);
+    border:1px solid rgba(0,217,255,.32);
+    background:rgba(0,217,255,.035);
+    padding:7px 14px;
+    border-radius:30px;
+    font-size:11px;
+    letter-spacing:1.8px;
+    margin-bottom:19px;
+    box-shadow:0 0 22px rgba(0,217,255,.06);
+}
+
+.hero h1{
+    font-size:clamp(42px,9vw,76px);
+    line-height:.95;
+    margin-bottom:18px;
+    letter-spacing:-2px;
+}
+
+.hero h1 span{
+    color:var(--green);
+    text-shadow:0 0 25px rgba(0,255,157,.18);
+}
+
+.hero p{
+    max-width:720px;
+    margin:auto;
+    color:#8fa0b3;
+    line-height:1.7;
+    font-size:14px;
+}
+
+/* MAIN */
+
+.container{
+    width:min(1050px,92%);
+    margin:auto;
+    padding-bottom:70px;
+}
+
+/* SCANNER BOX */
+
+.scan-box{
+    position:relative;
+    overflow:hidden;
+    background:
+        linear-gradient(145deg,#071321,#050e1a);
+    border:1px solid rgba(0,217,255,.18);
+    border-radius:24px;
+    padding:34px;
+    text-align:center;
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.4),
+        0 0 45px rgba(0,217,255,.025);
+}
+
+.scan-box::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+        linear-gradient(rgba(0,217,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,217,255,.025) 1px,transparent 1px);
+    background-size:35px 35px;
+}
+
+.drop-zone{
+    position:relative;
+    z-index:1;
+    min-height:245px;
+    border:1px dashed rgba(0,217,255,.35);
+    border-radius:20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging{
+    border-color:var(--green);
+    background:rgba(0,255,157,.035);
+    box-shadow:
+        inset 0 0 40px rgba(0,255,157,.025),
+        0 0 30px rgba(0,255,157,.05);
+}
+
+/* APK ICON */
+
+.apk-icon{
+    width:70px;
+    height:70px;
+    border-radius:18px;
+    border:1px solid rgba(0,255,157,.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--green);
+    font-size:17px;
+    font-weight:900;
+    letter-spacing:1px;
+    margin-bottom:17px;
+    background:
+        linear-gradient(145deg,#071a18,#071321);
+    box-shadow:
+        0 0 28px rgba(0,255,157,.08),
+        inset 0 0 20px rgba(0,255,157,.025);
+}
+
+.drop-zone h2{
+    font-size:20px;
+    margin-bottom:8px;
+}
+
+.drop-zone p{
+    color:#71849a;
+    font-size:13px;
+}
+
+/* BUTTONS */
+
+.select-btn{
+    position:relative;
+    z-index:1;
+    margin-top:22px;
+    background:var(--green);
+    color:#03110a;
+    border:0;
+    border-radius:11px;
+    padding:13px 24px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.select-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 8px 25px rgba(0,255,157,.22),
+        0 0 15px rgba(0,255,157,.12);
+}
+
+input[type=file]{
+    display:none;
+}
+
+.file-info{
+    display:none;
+    position:relative;
+    z-index:1;
+    margin-top:18px;
+    padding:13px;
+    border:1px solid #193047;
+    background:#050e1a;
+    border-radius:11px;
+    color:#b7c8d8;
+    font-size:13px;
+    word-break:break-all;
+}
+
+.scan-button{
+    display:none;
+    margin:15px auto 0;
+    background:rgba(0,255,157,.045);
+    border:1px solid rgba(0,255,157,.42);
+    color:var(--green);
+    border-radius:11px;
+    padding:13px 25px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.scan-button:hover{
+    background:rgba(0,255,157,.09);
+    box-shadow:0 0 25px rgba(0,255,157,.08);
+    transform:translateY(-1px);
+}
+
+/* PROGRESS */
+
+.status{
+    display:none;
+    margin-top:25px;
+    position:relative;
+    z-index:1;
+}
+
+.progress{
+    height:5px;
+    background:#122234;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    width:0%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        var(--cyan),
+        var(--green)
+    );
+    transition:width .35s;
+    box-shadow:
+        0 0 12px rgba(0,255,157,.5);
+}
+
+.status-text{
+    margin-top:12px;
+    color:#8fa0b3;
+    font-size:13px;
+}
+
+/* RESULTS */
+
+.results{
+    display:none;
+    margin-top:22px;
+}
+
+.panel{
+    background:
+        linear-gradient(145deg,#071321,#050e1a);
+    border:1px solid rgba(0,217,255,.13);
+    border-radius:20px;
+    padding:25px;
+    margin-bottom:18px;
+    transition:.25s;
+}
+
+.panel:hover{
+    border-color:rgba(0,217,255,.28);
+    box-shadow:
+        0 0 28px rgba(0,217,255,.035),
+        0 15px 40px rgba(0,0,0,.25);
+}
+
+.panel h2{
+    font-size:20px;
+    margin-bottom:18px;
+}
+
+/* SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:28px;
+    align-items:center;
+}
+
+.score{
+    width:180px;
+    height:180px;
+    margin:auto;
+    border-radius:50%;
+    border:10px solid #142638;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    box-shadow:
+        0 0 45px rgba(0,255,157,.04),
+        inset 0 0 25px rgba(0,217,255,.025);
+}
+
+.score-number{
+    font-size:46px;
+    font-weight:800;
+    color:var(--green);
+    text-shadow:0 0 20px rgba(0,255,157,.18);
+}
+
+.score-small{
+    color:#70849a;
+    font-size:11px;
+    letter-spacing:1px;
+}
+
+.verdict{
+    font-size:29px;
+    font-weight:800;
+    margin-bottom:9px;
+    color:var(--green);
+}
+
+.verdict-text{
+    color:#8c9db0;
+    line-height:1.7;
+    font-size:14px;
+}
+
+/* META */
+
+.meta{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.meta-card{
+    padding:14px;
+    background:#050e1a;
+    border:1px solid #172c42;
+    border-radius:12px;
+    transition:.2s;
+}
+
+.meta-card:hover{
+    border-color:rgba(0,217,255,.3);
+}
+
+.meta-card label{
+    display:block;
+    color:#647991;
+    font-size:10px;
+    letter-spacing:1px;
+    margin-bottom:6px;
+}
+
+.meta-card div{
+    color:#c8d7e5;
+    font-size:13px;
+    word-break:break-all;
+}
+
+.hash{
+    font-family:monospace;
+    font-size:11px!important;
+    color:var(--cyan)!important;
+}
+
+/* FINDINGS */
+
+.findings{
+    display:grid;
+    gap:10px;
+}
+
+.finding{
+    background:#050e1a;
+    border:1px solid #182c40;
+    border-radius:13px;
+    padding:16px;
+    transition:.25s;
+}
+
+.finding:hover{
+    border-color:rgba(0,217,255,.28);
+    transform:translateX(2px);
+}
+
+.finding-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.finding-name{
+    font-weight:750;
+    font-size:14px;
+}
+
+.severity{
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.severity.critical{
+    color:#ff667d;
+    background:rgba(255,60,90,.08);
+    border:1px solid rgba(255,60,90,.25);
+}
+
+.severity.high{
+    color:#ffae67;
+    background:rgba(255,140,40,.08);
+    border:1px solid rgba(255,140,40,.22);
+}
+
+.severity.medium{
+    color:#ffe27b;
+    background:rgba(255,220,80,.07);
+    border:1px solid rgba(255,220,80,.18);
+}
+
+.severity.info{
+    color:var(--green);
+    background:rgba(0,255,157,.06);
+    border:1px solid rgba(0,255,157,.17);
+}
+
+.finding p{
+    color:#7e90a4;
+    font-size:13px;
+    line-height:1.6;
+    margin-top:8px;
+}
+
+.empty{
+    padding:25px;
+    text-align:center;
+    color:#6e8094;
+}
+
+/* ACTIONS */
+
+.actions{
+    display:grid;
+    gap:9px;
+}
+
+.action{
+    border-left:3px solid var(--green);
+    background:#050e1a;
+    padding:13px 15px;
+    color:#9bacbf;
+    font-size:13px;
+    line-height:1.55;
+    border-radius:0 9px 9px 0;
+    transition:.2s;
+}
+
+.action:hover{
+    background:#071321;
+    border-left-color:var(--cyan);
+}
+
+.disclaimer{
+    color:#64758a;
+    font-size:11px;
+    line-height:1.6;
+    margin-top:15px;
+}
+
+/* FOOTER */
+
+footer{
+    text-align:center;
+    color:#526579;
+    font-size:12px;
+    padding:30px 20px;
+    border-top:1px solid rgba(0,217,255,.08);
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+    nav{
+        padding:0 4%;
+    }
+
+    .nav-links{
+        gap:9px;
+    }
+
+    .nav-links a{
+        font-size:10px;
+    }
+
+    .hero{
+        padding-top:48px;
+    }
+
+    .scan-box{
+        padding:20px;
+    }
+
+    .summary{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .verdict-text{
+        text-align:left;
+    }
+
+    .meta{
+        grid-template-columns:1fr;
+    }
+
+}
+  /* Remove the default mobile blue tap highlight */
+*{
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* Remove the browser's default focus outline */
+a,
+button,
+input,
+select,
+textarea{
+    outline:none;
+}
+
+/* Keep a subtle CyberShield focus effect instead */
+a:focus-visible,
+button:focus-visible{
+    outline:2px solid rgba(0,255,157,.45);
+    outline-offset:3px;
+}
+
+/* Remove the flash while an element is being pressed */
+a:active,
+button:active{
+    -webkit-tap-highlight-color:transparent;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <div class="logo">CyberShield</div>
+
+    <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="link-checker.html">Link Checker</a>
+        <a href="password.html">Password</a>
+        <a href="log-analyzer.html">Log Analyzer</a>
+    </div>
+</nav>
+
+<section class="hero">
+
+    <div class="badge">ANDROID MALWARE ANALYSIS</div>
+
+    <h1>RAT<span>Guard</span></h1>
+
+    <p>
+        Analyze Android APK files for suspicious permissions,
+        components and RAT-like security indicators without
+        installing or executing the application.
+    </p>
+
+</section>
+
+<main class="container">
+
+<section class="scan-box">
+
+    <div
+        class="drop-zone"
+        id="dropZone"
+        onclick="document.getElementById('apkInput').click()"
+    >
+
+        <div class="apk-icon">APK</div>
+
+        <h2>Select an APK to Analyze</h2>
+
+        <p>
+            Choose an Android APK file from your device
+        </p>
+
+        <button
+            class="select-btn"
+            onclick="event.stopPropagation();document.getElementById('apkInput').click()"
+        >
+            Select APK
+        </button>
+
+    </div>
+
+    <input
+        id="apkInput"
+        type="file"
+        accept=".apk,application/vnd.android.package-archive"
+    >
+
+    <div class="file-info" id="fileInfo"></div>
+
+    <button
+        class="scan-button"
+        id="scanButton"
+        onclick="startScan()"
+    >
+        Scan APK
+    </button>
+
+    <div class="status" id="status">
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="status-text" id="statusText">
+            Preparing scanner...
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="results" id="results">
+
+    <div class="panel">
+
+        <h2>RATGuard Security Report</h2>
+
+        <div class="summary">
+
+            <div class="score" id="scoreCircle">
+
+                <div
+                    class="score-number"
+                    id="scoreNumber"
+                >
+                    0
+                </div>
+
+                <div class="score-small">
+                    RISK SCORE
+                </div>
+
+            </div>
+
+            <div>
+
+                <div
+                    class="verdict"
+                    id="verdict"
+                >
+                    Analysis
+                </div>
+
+                <p
+                    class="verdict-text"
+                    id="verdictText"
+                >
+                    Waiting for analysis.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>APK Information</h2>
+
+        <div class="meta">
+
+            <div class="meta-card">
+                <label>FILE NAME</label>
+                <div id="metaFile">—</div>
+            </div>
+
+            <div class="meta-card">
+                <label>FILE SIZE</label>
+                <div id="metaSize">—</div>
+            </div>
+
+            <div class="meta-card">
+                <label>PACKAGE</label>
+                <div id="metaPackage">—</div>
+            </div>
+
+            <div class="meta-card">
+                <label>VERSION</label>
+                <div id="metaVersion">—</div>
+            </div>
+
+            <div class="meta-card">
+                <label>SHA-256</label>
+                <div
+                    class="hash"
+                    id="metaHash"
+                >
+                    —
+                </div>
+            </div>
+
+            <div class="meta-card">
+                <label>MANIFEST</label>
+                <div id="metaManifest">—</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>Detected Security Indicators</h2>
+
+        <div
+            class="findings"
+            id="findings"
+        ></div>
+
+    </div>
+
+
+    <div class="panel">
+
+        <h2>Recommended Actions</h2>
+
+        <div
+            class="actions"
+            id="actions"
+        ></div>
+
+        <p class="disclaimer">
+            RATGuard performs static analysis. A high-risk result does
+            not by itself prove that an APK is malware, while a low-risk
+            result does not guarantee that an application is safe.
+            No APK is installed or executed by this scanner.
+        </p>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<footer>
+    Learn. Analyze. Stay Secure.<br><br>
+    © 2026 CyberShield
+</footer>
+
+
+<script>
+
+/* =========================================================
+   RATGuard
+   Automatic Android APK Static Analysis
+   ========================================================= */
+
+let selectedAPK = null;
+
+
+/* ---------- Utility ---------- */
+
+function escapeHTML(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function formatBytes(bytes){
+
+    if(bytes < 1024)
+        return bytes + " B";
+
+    if(bytes < 1024*1024)
+        return (bytes/1024).toFixed(1) + " KB";
+
+    return (bytes/(1024*1024)).toFixed(2) + " MB";
+
+}
+
+
+async function sha256(file){
+
+    const buffer = await file.arrayBuffer();
+
+    const hash =
+        await crypto.subtle.digest("SHA-256",buffer);
+
+    return [...new Uint8Array(hash)]
+        .map(b => b.toString(16).padStart(2,"0"))
+        .join("");
+
+}
+
+
+/* ---------- File selection ---------- */
+
+document
+.getElementById("apkInput")
+.addEventListener("change",function(){
+
+    if(!this.files.length)
+        return;
+
+    selectedAPK = this.files[0];
+
+    showSelectedFile();
+
+});
+
+
+function showSelectedFile(){
+
+    const info =
+        document.getElementById("fileInfo");
+
+    const button =
+        document.getElementById("scanButton");
+
+    info.style.display = "block";
+
+    info.innerHTML =
+        "<strong>" +
+        escapeHTML(selectedAPK.name) +
+        "</strong><br>" +
+        formatBytes(selectedAPK.size);
+
+    button.style.display = "inline-block";
+
+}
+
+
+/* ---------- Drag & Drop ---------- */
+
+const dropZone =
+    document.getElementById("dropZone");
+
+
+dropZone.addEventListener("dragover",e=>{
+
+    e.preventDefault();
+
+    dropZone.classList.add("dragging");
+
+});
+
+
+dropZone.addEventListener("dragleave",()=>{
+
+    dropZone.classList.remove("dragging");
+
+});
+
+
+dropZone.addEventListener("drop",e=>{
+
+    e.preventDefault();
+
+    dropZone.classList.remove("dragging");
+
+    const file = e.dataTransfer.files[0];
+
+    if(!file)
+        return;
+
+    if(!file.name.toLowerCase().endsWith(".apk")){
+
+        alert("Please select an APK file.");
+
+        return;
+
+    }
+
+    selectedAPK = file;
+
+    showSelectedFile();
+
+});
+
+
+/* =========================================================
+   Android Binary XML parser
+   ========================================================= */
+
+class AXMLParser{
+
+    constructor(buffer){
+
+        this.data =
+            new Uint8Array(buffer);
+
+        this.view =
+            new DataView(buffer);
+
+        this.strings = [];
+
+        this.offset = 0;
+
+        this.namespaces = {};
+
+        this.packageName = "";
+
+        this.versionCode = "";
+
+        this.versionName = "";
+
+        this.permissions = [];
+
+        this.components = [];
+
+        this.parse();
+
+    }
+
+
+    u16(pos){
+
+        return this.view.getUint16(pos,true);
+
+    }
+
+
+    u32(pos){
+
+        return this.view.getUint32(pos,true);
+
+    }
+
+
+    string(index){
+
+        if(
+            index === 0xffffffff ||
+            index < 0 ||
+            index >= this.strings.length
+        )
+            return "";
+
+        return this.strings[index] || "";
+
+    }
+
+
+    parseStringPool(offset){
+
+        const stringCount =
+            this.u32(offset + 8);
+
+        const flags =
+            this.u32(offset + 16);
+
+        const stringsStart =
+            this.u32(offset + 20);
+
+        const offsetsStart =
+            offset + 28;
+
+        const isUTF8 =
+            (flags & 0x100) !== 0;
+
+        for(let i=0;i<stringCount;i++){
+
+            const rel =
+                this.u32(offsetsStart + i*4);
+
+            const pos =
+                offset + stringsStart + rel;
+
+            if(isUTF8){
+
+                const len1 =
+                    this.data[pos];
+
+                let p = pos + 1;
+
+                let len;
+
+                if(len1 & 0x80){
+
+                    len =
+                        ((len1 & 0x7f)<<8) |
+                        this.data[p++];
+
+                }else{
+
+                    len = len1;
+
+                }
+
+                const byteLen =
+                    this.data[p];
+
+                p++;
+
+                let actualLen;
+
+                if(byteLen & 0x80){
+
+                    actualLen =
+                        ((byteLen & 0x7f)<<8) |
+                        this.data[p++];
+
+                }else{
+
+                    actualLen = byteLen;
+
+                }
+
+                const bytes =
+                    this.data.slice(
+                        p,
+                        p + actualLen
+                    );
+
+                this.strings.push(
+                    new TextDecoder().decode(bytes)
+                );
+
+            }else{
+
+                const len =
+                    this.u16(pos);
+
+                const bytes =
+                    this.data.slice(
+                        pos + 2,
+                        pos + 2 + len*2
+                    );
+
+                this.strings.push(
+                    new TextDecoder("utf-16le")
+                    .decode(bytes)
+                );
+
+            }
+
+        }
+
+    }
+
+
+    parse(){
+
+        if(this.data.length < 8)
+            throw new Error("Invalid binary XML");
+
+        let pos = 0;
+
+        const fileType =
+            this.u16(pos);
+
+        if(fileType !== 0x0003)
+            throw new Error("Not Android binary XML");
+
+        const headerSize =
+            this.u16(pos + 2);
+
+        const fileSize =
+            this.u32(pos + 4);
+
+        pos = headerSize;
+
+
+        while(
+            pos + 8 <= this.data.length &&
+            pos < fileSize
+        ){
+
+            const type =
+                this.u16(pos);
+
+            const size =
+                this.u16(pos + 2);
+
+            const chunkSize =
+                this.u32(pos + 4);
+
+            if(chunkSize < 8)
+                break;
+
+
+            /* String pool */
+
+            if(type === 0x0001){
+
+                this.parseStringPool(pos);
+
+            }
+
+
+            /* START_NAMESPACE */
+
+            else if(type === 0x0100){
+
+                const prefix =
+                    this.string(
+                        this.u32(pos + 16)
+                    );
+
+                const uri =
+                    this.string(
+                        this.u32(pos + 20)
+                    );
+
+                this.namespaces[prefix] = uri;
+
+            }
+
+
+            /* START_TAG */
+
+            else if(type === 0x0102){
+
+                this.parseStartTag(pos);
+
+            }
+
+
+            pos += chunkSize;
+
+        }
+
+    }
+
+
+    parseStartTag(pos){
+
+        const nameIndex =
+            this.u32(pos + 20);
+
+        const name =
+            this.string(nameIndex);
+
+        const attributeCount =
+            this.u16(pos + 28);
+
+        const attrs = {};
+
+        let attrPos =
+            pos + 36;
+
+        for(
+            let i=0;
+            i<attributeCount;
+            i++
+        ){
+
+            const namespace =
+                this.u32(attrPos);
+
+            const attrNameIndex =
+                this.u32(attrPos + 4);
+
+            const rawValueIndex =
+                this.u32(attrPos + 8);
+
+            const attrType =
+                this.u32(attrPos + 12);
+
+            const attrData =
+                this.u32(attrPos + 16);
+
+            const attrName =
+                this.string(attrNameIndex);
+
+            let value;
+
+            if(rawValueIndex !== 0xffffffff){
+
+                value =
+                    this.string(rawValueIndex);
+
+            }else{
+
+                                value =
+                    attrData;
+
+            }
+
+            attrs[attrName] = value;
+
+            attrPos += 20;
+
+        }
+
+
+        if(name === "manifest"){
+
+            if(attrs["package"])
+                this.packageName =
+                    attrs["package"];
+
+            if(attrs["versionCode"])
+                this.versionCode =
+                    attrs["versionCode"];
+
+            if(attrs["versionName"])
+                this.versionName =
+                    attrs["versionName"];
+
+        }
+
+
+        if(name === "uses-permission"){
+
+            const permission =
+                attrs["name"];
+
+            if(permission){
+
+                this.permissions.push(
+                    permission
+                );
+
+            }
+
+        }
+
+
+        const componentTypes = [
+            "activity",
+            "service",
+            "receiver",
+            "provider"
+        ];
+
+
+        if(componentTypes.includes(name)){
+
+            this.components.push({
+
+                type:name,
+
+                name:
+                    attrs["name"] || "",
+
+                exported:
+                    attrs["exported"] ?? ""
+
+            });
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RATGuard Security Rules
+   ========================================================= */
+
+const RULES = [
+
+    {
+        key:"SMS",
+        match:[
+            "android.permission.READ_SMS",
+            "android.permission.RECEIVE_SMS",
+            "android.permission.SEND_SMS"
+        ],
+        score:18,
+        severity:"HIGH",
+        title:"SMS access detected",
+        description:
+            "The APK requests access to SMS functionality."
+    },
+
+    {
+        key:"NOTIFICATION",
+        match:[
+            "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+        ],
+        score:18,
+        severity:"HIGH",
+        title:"Notification access indicator",
+        description:
+            "The APK references notification-listener capabilities."
+    },
+
+    {
+        key:"ACCESSIBILITY",
+        match:[
+            "android.permission.BIND_ACCESSIBILITY_SERVICE"
+        ],
+        score:25,
+        severity:"CRITICAL",
+        title:"Accessibility service detected",
+        description:
+            "Accessibility services can provide powerful control over device interaction."
+    },
+
+    {
+        key:"OVERLAY",
+        match:[
+            "android.permission.SYSTEM_ALERT_WINDOW"
+        ],
+        score:13,
+        severity:"HIGH",
+        title:"Screen overlay capability",
+        description:
+            "The APK can request permission to display content over other applications."
+    },
+
+    {
+        key:"CONTACTS",
+        match:[
+            "android.permission.READ_CONTACTS",
+            "android.permission.WRITE_CONTACTS"
+        ],
+        score:6,
+        severity:"MEDIUM",
+        title:"Contacts access",
+        description:
+            "The APK requests access to contacts."
+    },
+
+    {
+        key:"MICROPHONE",
+        match:[
+            "android.permission.RECORD_AUDIO"
+        ],
+        score:9,
+        severity:"MEDIUM",
+        title:"Microphone access",
+        description:
+            "The APK requests microphone access."
+    },
+
+    {
+        key:"CAMERA",
+        match:[
+            "android.permission.CAMERA"
+        ],
+        score:7,
+        severity:"MEDIUM",
+        title:"Camera access",
+        description:
+            "The APK requests camera access."
+    },
+
+    {
+        key:"STORAGE",
+        match:[
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE"
+        ],
+        score:9,
+        severity:"MEDIUM",
+        title:"Storage access",
+        description:
+            "The APK requests storage access."
+    },
+
+    {
+        key:"PHONE",
+        match:[
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.CALL_PHONE",
+            "android.permission.READ_CALL_LOG",
+            "android.permission.WRITE_CALL_LOG"
+        ],
+        score:10,
+        severity:"HIGH",
+        title:"Phone or call-log access",
+        description:
+            "The APK requests sensitive phone or call-related permissions."
+    },
+
+    {
+        key:"VPN",
+        match:[
+            "android.permission.BIND_VPN_SERVICE"
+        ],
+        score:11,
+        severity:"HIGH",
+        title:"VPN service capability",
+        description:
+            "The APK declares VPN-related functionality."
+    },
+
+    {
+        key:"BOOT",
+        match:[
+            "android.permission.RECEIVE_BOOT_COMPLETED"
+        ],
+        score:12,
+        severity:"HIGH",
+        title:"Boot persistence indicator",
+        description:
+            "The application can request startup after device boot."
+    },
+
+    {
+        key:"DEVICE_ADMIN",
+        match:[
+            "android.permission.BIND_DEVICE_ADMIN"
+        ],
+        score:18,
+        severity:"HIGH",
+        title:"Device administration capability",
+        description:
+            "The APK references device-administration functionality."
+    },
+
+    {
+        key:"INTERNET",
+        match:[
+            "android.permission.INTERNET"
+        ],
+        score:3,
+        severity:"INFO",
+        title:"Internet access",
+        description:
+            "The APK requests network access."
+    },
+
+    {
+        key:"INSTALL",
+        match:[
+            "android.permission.REQUEST_INSTALL_PACKAGES"
+        ],
+        score:14,
+        severity:"HIGH",
+        title:"Package installation capability",
+        description:
+            "The APK requests package-installation capability."
+    }
+
+];
+
+
+function setProgress(percent,text){
+
+    document.getElementById("progressBar")
+        .style.width =
+        percent + "%";
+
+    document.getElementById("statusText")
+        .textContent =
+        text;
+
+}
+
+
+function addFinding(
+    container,
+    severity,
+    title,
+    description
+){
+
+    const div =
+        document.createElement("div");
+
+    div.className =
+        "finding";
+
+    div.innerHTML =
+        '<div class="finding-top">' +
+        '<div class="finding-name">' +
+        escapeHTML(title) +
+        '</div>' +
+        '<div class="severity ' +
+        severity.toLowerCase() +
+        '">' +
+        escapeHTML(severity) +
+        '</div>' +
+        '</div>' +
+        '<p>' +
+        escapeHTML(description) +
+        '</p>';
+
+    container.appendChild(div);
+
+}
+
+
+async function startScan(){
+
+    if(!selectedAPK){
+
+        alert("Please select an APK first.");
+
+        return;
+
+    }
+
+    const results =
+        document.getElementById("results");
+
+    const status =
+        document.getElementById("status");
+
+    const findings =
+        document.getElementById("findings");
+
+    const actions =
+        document.getElementById("actions");
+
+    results.style.display =
+        "none";
+
+    status.style.display =
+        "block";
+
+    findings.innerHTML = "";
+
+    actions.innerHTML = "";
+
+
+    try{
+
+        setProgress(
+            10,
+            "Reading APK file..."
+        );
+
+        await new Promise(
+            r => setTimeout(r,300)
+        );
+
+
+        setProgress(
+            20,
+            "Calculating SHA-256..."
+        );
+
+        const hash =
+            await sha256(selectedAPK);
+
+
+        setProgress(
+            35,
+            "Opening APK structure..."
+        );
+
+        const reader =
+            new zip.ZipReader(
+                new zip.BlobReader(selectedAPK)
+            );
+
+        const entries =
+            await reader.getEntries();
+
+
+        const manifestEntry =
+            entries.find(
+                e =>
+                e.filename ===
+                "AndroidManifest.xml"
+            );
+
+
+        if(!manifestEntry){
+
+            await reader.close();
+
+            throw new Error(
+                "AndroidManifest.xml was not found."
+            );
+
+        }
+
+
+        setProgress(
+            50,
+            "Parsing AndroidManifest.xml..."
+        );
+
+
+        const manifestBlob =
+            await manifestEntry.getData(
+                new zip.BlobWriter()
+            );
+
+        const manifestBuffer =
+            await manifestBlob.arrayBuffer();
+
+
+        const parser =
+            new AXMLParser(
+                manifestBuffer
+            );
+
+
+        setProgress(
+            65,
+            "Checking permissions..."
+        );
+
+
+        await new Promise(
+            r => setTimeout(r,300)
+        );
+
+
+        const permissions =
+            parser.permissions.map(
+                p =>
+                p.toUpperCase()
+            );
+
+
+        let score = 0;
+
+        const detected = [];
+
+
+        for(const rule of RULES){
+
+            const matched =
+                rule.match.some(
+                    permission =>
+                    permissions.includes(
+                        permission.toUpperCase()
+                    )
+                );
+
+            if(matched){
+
+                score +=
+                    rule.score;
+
+                detected.push({
+
+                    severity:
+                        rule.severity,
+
+                    title:
+                        rule.title,
+
+                    description:
+                        rule.description,
+
+                    key:
+                        rule.key
+
+                });
+
+            }
+
+        }
+
+
+        setProgress(
+            78,
+            "Checking suspicious permission combinations..."
+        );
+
+
+        const has =
+            key =>
+            detected.some(
+                item =>
+                item.key === key
+            );
+
+
+        if(
+            has("SMS") &&
+            has("ACCESSIBILITY")
+        ){
+
+            score += 15;
+
+            detected.push({
+
+                severity:"CRITICAL",
+
+                title:
+                    "SMS + Accessibility combination",
+
+                description:
+                    "The APK combines SMS-related access with Accessibility capability.",
+
+                key:
+                    "COMBO_SMS_ACCESSIBILITY"
+
+            });
+
+        }
+
+
+        if(
+            has("NOTIFICATION") &&
+            has("ACCESSIBILITY")
+        ){
+
+            score += 12;
+
+            detected.push({
+
+                severity:"CRITICAL",
+
+                title:
+                    "Notification + Accessibility combination",
+
+                description:
+                    "Notification access and Accessibility capability are both present.",
+
+                key:
+                    "COMBO_NOTIFICATION_ACCESSIBILITY"
+
+            });
+
+        }
+
+
+        if(
+            has("OVERLAY") &&
+            has("ACCESSIBILITY")
+        ){
+
+            score += 10;
+
+            detected.push({
+
+                severity:"HIGH",
+
+                title:
+                    "Overlay + Accessibility combination",
+
+                description:
+                    "Both overlay and Accessibility capabilities are present.",
+
+                key:
+                    "COMBO_OVERLAY_ACCESSIBILITY"
+
+            });
+
+        }
+
+
+        if(
+            has("BOOT") &&
+            has("ACCESSIBILITY")
+        ){
+
+            score += 10;
+
+            detected.push({
+
+                severity:"HIGH",
+
+                title:
+                    "Boot startup + Accessibility combination",
+
+                description:
+                    "Boot startup and Accessibility capabilities are both present.",
+
+                key:
+                    "COMBO_BOOT_ACCESSIBILITY"
+
+            });
+
+        }
+
+
+        score =
+            Math.min(100,score);
+
+
+        setProgress(
+            90,
+            "Generating security report..."
+        );
+
+
+        document.getElementById("metaFile")
+            .textContent =
+            selectedAPK.name;
+
+        document.getElementById("metaSize")
+            .textContent =
+            formatBytes(
+                selectedAPK.size
+            );
+
+        document.getElementById("metaPackage")
+            .textContent =
+            parser.packageName ||
+            "Unknown";
+
+        document.getElementById("metaVersion")
+            .textContent =
+            (
+                parser.versionName ||
+                parser.versionCode
+            ) ||
+            "Unknown";
+
+        document.getElementById("metaHash")
+            .textContent =
+            hash;
+
+        document.getElementById("metaManifest")
+            .textContent =
+            "Binary Android XML parsed";
+
+
+        document.getElementById("scoreNumber")
+            .textContent =
+            score;
+
+
+        const verdict =
+            document.getElementById("verdict");
+
+        const verdictText =
+            document.getElementById("verdictText");
+
+
+        let level;
+
+
+        if(score >= 75){
+
+            level =
+                "CRITICAL RISK";
+
+            verdictText.textContent =
+                "Multiple high-risk indicators were detected. Treat this APK as unsafe until verified.";
+
+        }else if(score >= 50){
+
+            level =
+                "HIGH RISK";
+
+            verdictText.textContent =
+                "Several suspicious capabilities were detected. Further verification is recommended.";
+
+        }else if(score >= 25){
+
+            level =
+                "MEDIUM RISK";
+
+            verdictText.textContent =
+                "The APK requests several sensitive capabilities. Review the application carefully.";
+
+        }else{
+
+            level =
+                "LOW RISK";
+
+            verdictText.textContent =
+                "No major suspicious permission combination was detected. This does not guarantee safety.";
+
+        }
+
+
+        verdict.textContent =
+            level;
+
+
+        if(detected.length === 0){
+
+            findings.innerHTML =
+                '<div class="empty">' +
+                'No suspicious permission indicators detected.' +
+                '</div>';
+
+        }else{
+
+            detected.forEach(
+                item => {
+
+                    addFinding(
+                        findings,
+                        item.severity,
+                        item.title,
+                        item.description
+                    );
+
+                }
+            );
+
+        }
+
+
+        const recommendations = [];
+
+
+        if(score >= 50){
+
+            recommendations.push(
+                "Do not install the APK until its source and authenticity have been verified."
+            );
+
+        }
+
+
+        if(
+            permissions.some(
+                p =>
+                p.includes("SMS")
+            )
+        ){
+
+            recommendations.push(
+                "Be especially careful with APKs requesting SMS permissions."
+            );
+
+        }
+
+
+        if(
+            has("ACCESSIBILITY")
+        ){
+
+            recommendations.push(
+                "Do not grant Accessibility access to an unknown or untrusted application."
+            );
+
+        }
+
+
+        if(
+            has("OVERLAY")
+        ){
+
+            recommendations.push(
+                "Review whether overlay functionality is genuinely required."
+            );
+
+        }
+
+
+        if(
+            has("BOOT")
+        ){
+
+            recommendations.push(
+                "Check whether the application legitimately needs startup after boot."
+            );
+
+        }
+
+
+        recommendations.push(
+            "Prefer applications from trusted official app stores or verified developers."
+        );
+
+
+        recommendations.push(
+            "Keep Android, Play Protect and installed applications updated."
+        );
+
+
+        recommendations.forEach(
+            text => {
+
+                const div =
+                    document.createElement("div");
+
+                div.className =
+                    "action";
+
+                div.textContent =
+                    text;
+
+                actions.appendChild(div);
+
+            }
+        );
+
+
+        await reader.close();
+
+
+        setProgress(
+            100,
+            "Analysis complete."
+        );
+
+
+        results.style.display =
+            "block";
+
+
+        setTimeout(
+            () => {
+
+                results.scrollIntoView({
+                    behavior:"smooth",
+                    block:"start"
+                });
+
+            },
+            150
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        setProgress(
+            0,
+            "Scan failed."
+        );
+
+        alert(
+            "RATGuard could not analyze this APK.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

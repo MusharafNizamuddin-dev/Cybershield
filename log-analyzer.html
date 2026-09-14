@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield - Log Analyzer</title>
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:#050b12;color:#fff}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.container{width:92%;max-width:1100px;margin:auto;padding:25px 0 60px}
+.header{text-align:center;margin-bottom:25px}.header h1{margin:0;font-size:32px;color:#00ff9d}.header p{color:#9eacbf;margin:8px 0 0}.page-title{display:inline-flex;align-items:center;justify-content:center;gap:12px}.title-icon{width:42px;height:42px;fill:none;stroke:#00d9ff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 7px rgba(0,217,255,.28))}.title-icon path:nth-child(n+5){stroke:#00ff9d;stroke-width:2.5}.title-icon path:nth-child(4){stroke:#00ff9d}
+.upload-box,.panel,.stat{background:#0b1522;border:1px solid #1d334a;border-radius:16px}
+.upload-box{padding:22px;text-align:center;margin-bottom:24px}
+.file-picker{display:flex;align-items:center;justify-content:center;gap:12px;max-width:560px;margin:auto;padding:10px;background:#071321;border:1px solid #294158;border-radius:12px;text-align:left}
+.file-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.choose-file{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 17px;background:#17283a;color:#fff;border:1px solid #294158;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.choose-file:active,button:active{transform:scale(.97)}
+.file-name{margin:0;color:#9eacbf;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.buttons{display:flex;justify-content:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+button{border:none;border-radius:10px;padding:12px 22px;font-size:15px;font-weight:bold;cursor:pointer}.demo-btn{background:#17283a;color:#fff}.analyze-btn{background:#00ff9d;color:#03110c}
+.results{display:none}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:24px}.stat{padding:18px;text-align:center}.stat-number{font-size:30px;font-weight:bold;color:#00ff9d}.stat-label{margin-top:7px;color:#9eacbf;font-size:14px}
+.panel{padding:22px;margin-bottom:24px}.panel h2{margin:0;font-size:20px}.header-row{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px}.header-row h2{margin:0}.manual-btn{background:#17283a;color:#dce7f2;border:1px solid #294158;padding:9px 14px;font-size:13px}.manual-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#0b1522;border:1px solid #1d334a;border-radius:16px;padding:18px 20px;margin-bottom:20px}.manual-intro-copy h2{margin:0 0 6px;font-size:18px;color:#dce7f2}.manual-intro-copy p{margin:0;color:#9eacbf;font-size:13px;line-height:1.5}.manual-intro .manual-btn{flex-shrink:0}.manual-steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.manual-step{font-size:12px;color:#b9c5d3;background:#071321;border:1px solid #1d334a;border-radius:8px;padding:7px 10px}
+.manual-intro{display:flex;align-items:center;justify-content:space-between;gap:18px;background:#0b1522;border:1px solid #1d334a;border-radius:16px;padding:18px 20px;margin-bottom:20px}.manual-intro-copy h2{margin:0 0 6px;font-size:18px;color:#dce7f2}.manual-intro-copy p{margin:0;color:#9eacbf;font-size:13px;line-height:1.5}.manual-intro .manual-btn{flex-shrink:0}.manual-steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.manual-step{font-size:12px;color:#b9c5d3;background:#071321;border:1px solid #1d334a;border-radius:8px;padding:7px 10px}
+@media(max-width:620px){.chart-container{min-height:270px}.status-chart{width:270px;height:270px}.manual-intro{align-items:flex-start;flex-direction:column}.manual-intro .manual-btn{width:100%}}
+.brute-status{display:flex;align-items:center;gap:14px;padding:16px;border-radius:13px;margin-bottom:22px;border:1px solid;transition:.2s}.brute-safe{background:rgba(0,255,157,.06);border-color:rgba(0,255,157,.28)}.brute-danger{background:rgba(255,77,109,.08);border-color:rgba(255,77,109,.45)}.status-icon{font-size:27px;flex-shrink:0}.status-title{font-size:16px;font-weight:700;margin-bottom:4px}.brute-safe .status-title{color:#00ff9d}.brute-danger .status-title{color:#ff4d6d}.status-detail{font-size:13px;line-height:1.5;color:#9eacbf}
+.chart-layout{display:flex;align-items:center;justify-content:center;gap:34px;width:100%}
+.chart-container{display:flex;justify-content:center;align-items:center;flex:1;min-width:0;min-height:300px}
+.status-chart{width:300px;height:300px;max-width:100%;display:block;filter:drop-shadow(0 0 18px rgba(0,217,255,.08))}
+.chart-container::before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;border:1px solid rgba(0,217,255,.10);pointer-events:none}
+.request-status-panel{overflow:hidden}
+.legend-item{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.legend-item:hover{transform:translateY(-2px);border-color:rgba(0,217,255,.55);box-shadow:0 0 22px rgba(0,217,255,.10)}.legend{display:flex;flex-direction:column;gap:10px;width:210px}.legend-item{background:#0b1724;border:1px solid #1d334a;border-radius:12px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:10px;min-height:78px}.legend-name{font-size:15px}.legend-percent{font-size:22px;font-weight:700}.legend-count{grid-column:2/4;color:#9eacbf;font-size:13px;margin-top:2px}.success-dot,.failed-dot{font-size:18px}.success-dot{color:#00ff9d}.failed-dot{color:#ff4d6d}
+.activity-chart-wrap{position:relative;width:100%;height:290px;background:#071321;border:1px solid #1d334a;border-radius:14px;padding:12px 8px 8px;margin-top:12px;overflow:hidden}.activity-chart{width:100%;height:100%;display:block}.activity-legend{display:flex;justify-content:center;align-items:center;gap:28px;flex-wrap:wrap;margin-top:14px;color:#b9c5d3;font-size:14px}.activity-legend span{display:inline-flex;align-items:center;gap:7px}.activity-dot{font-size:16px}.activity-note{text-align:center;color:#7f90a4;font-size:12px;margin-top:8px}
+.event{padding:15px;border-radius:10px;background:#101d2b;border-left:4px solid #294158;margin-bottom:12px}.event strong{display:block;margin-bottom:5px}.event span{color:#9eacbf;font-size:14px}.event.danger{border-left-color:#ff4d6d}.event.warning{border-left-color:#ffc857}
+.table-wrapper{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:430px}th,td{padding:13px;text-align:left;border-bottom:1px solid #1d334a}th{color:#00ff9d}td{color:#c8d3df}
+/* USER MANUAL */
+.manual-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:16px;overflow-y:auto}.manual-content{position:relative;width:100%;max-width:650px;max-height:88vh;overflow-y:auto;overflow-x:hidden;background:#0b1522;border:1px solid #294158;border-radius:18px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.manual-header{display:flex;align-items:center;justify-content:space-between;gap:12px}.manual-header h2{margin:0;color:#00ff9d}.manual-body h3{font-size:16px;margin:22px 0 8px;color:#dce7f2}.manual-body p,.manual-body li{color:#9eacbf;font-size:14px;line-height:1.6}.manual-body pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#071321;border:1px solid #1d334a;border-radius:9px;padding:12px;color:#cfe0ed;font-size:12px}.manual-close{width:40px;height:40px;padding:0;background:#17283a;color:#fff;border:1px solid #294158;font-size:22px}
+@media(max-width:850px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.chart-container{min-height:270px}.status-chart{width:270px;height:270px}.manual-intro{align-items:flex-start;flex-direction:column}.manual-intro .manual-btn{width:100%}.chart-layout{flex-direction:column;gap:18px}.legend{width:100%;display:grid;grid-template-columns:1fr 1fr}.legend-item{min-height:68px;padding:11px 12px}.legend-percent{font-size:20px}.activity-chart-wrap{height:250px}.header-row{align-items:flex-start}}
+@media(max-width:500px){.container{width:94%;padding-top:18px}.header h1{font-size:27px}.page-title{gap:9px}.title-icon{width:35px;height:35px}.file-picker{justify-content:flex-start;padding:9px}.choose-file{padding:10px 12px;font-size:13px}.file-name{font-size:13px}.stats{gap:10px}.stat{padding:14px 9px}.stat-number{font-size:25px}.panel{padding:18px}.activity-chart-wrap{height:245px}}
+button,
+button:focus,
+button:active,
+label,
+label:focus,
+label:active{
+    outline:none !important;
+    -webkit-tap-highlight-color:transparent !important;
+}
+</style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<body>
+<canvas id="bgCanvas"></canvas>
+<script>
+(function(){
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height, particles;
+
+    function resize(){
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function createParticles(){
+        const count = Math.min(70, Math.floor((width*height)/18000));
+        particles = [];
+        for(let i=0;i<count;i++){
+            particles.push({
+                x: Math.random()*width,
+                y: Math.random()*height,
+                vx: (Math.random()-0.5)*0.25,
+                vy: (Math.random()-0.5)*0.25,
+                r: Math.random()*1.6+0.6
+            });
+        }
+    }
+
+    function step(){
+        ctx.clearRect(0,0,width,height);
+
+        for(let i=0;i<particles.length;i++){
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > width) p.vx *= -1;
+            if(p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = "rgba(0,217,255,0.55)";
+            ctx.fill();
+        }
+
+        for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const a = particles[i], b = particles[j];
+                const dx = a.x-b.x, dy = a.y-b.y;
+                const dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist < 130){
+                    ctx.beginPath();
+                    ctx.moveTo(a.x,a.y);
+                    ctx.lineTo(b.x,b.y);
+                    ctx.strokeStyle = "rgba(0,255,157," + (0.12*(1-dist/130)) + ")";
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    resize();
+    createParticles();
+    step();
+
+    window.addEventListener("resize", function(){
+        resize();
+        createParticles();
+    });
+})();
+</script>
+
+<div class="container">
+
+<div class="header">
+<h1 class="page-title">
+<svg class="title-icon" viewBox="0 0 64 64" aria-hidden="true">
+<path d="M10 52V12"/>
+<path d="M10 52H56"/>
+<path d="M18 43L27 33L35 39L50 20"/>
+<path d="M43 20H50V27"/>
+<path d="M20 52V44"/>
+<path d="M31 52V38"/>
+<path d="M42 52V31"/>
+</svg>
+<span>Log Analyzer</span>
+</h1>
+<p>Analyze security logs and detect suspicious activity.</p>
+</div>
+
+<div class="manual-intro">
+<div class="manual-intro-copy">
+<h2>📖 How to use Log Analyzer</h2>
+<p>Learn the three simple steps before you upload a log file.</p>
+<div class="manual-steps">
+<span class="manual-step">1. 📁 Upload</span>
+<span class="manual-step">2. 🔍 Analyze</span>
+<span class="manual-step">3. 📊 Review results</span>
+</div>
+</div>
+<button class="manual-btn" type="button" onclick="openManual()">View Full User Manual</button>
+</div>
+
+<div class="upload-box">
+<div class="file-picker">
+<input class="file-input" type="file" id="logFile" accept=".log,.txt">
+<label class="choose-file" for="logFile">📁 Choose Log File</label>
+<div class="file-name" id="fileName">No file selected</div>
+</div>
+<div class="buttons">
+<button class="demo-btn" id="demoButton" type="button">Load Demo Log</button>
+<button class="analyze-btn" id="analyzeButton" type="button">Analyze Log</button>
+</div>
+</div>
+
+<div class="results" id="results">
+
+<div class="stats">
+<div class="stat"><div class="stat-number" id="totalRequests">0</div><div class="stat-label">Total Requests</div></div>
+<div class="stat"><div class="stat-number" id="failedRequests">0</div><div class="stat-label">Failed Requests</div></div>
+<div class="stat"><div class="stat-number" id="uniqueIPs">0</div><div class="stat-label">Unique IPs</div></div>
+<div class="stat"><div class="stat-number" id="securityEvents">0</div><div class="stat-label">Security Events</div></div>
+</div>
+
+<div class="panel request-status-panel">
+<div class="header-row">
+<h2>Request Status</h2>
+</div>
+
+<div id="bruteStatus" class="brute-status brute-safe">
+<div class="status-icon">🛡️</div>
+<div>
+<div class="status-title" id="bruteTitle">No Brute Force Activity Detected</div>
+<div class="status-detail" id="bruteDetail">Analyze a log to check for repeated failed login attempts.</div>
+</div>
+</div>
+
+<div class="chart-layout">
+<div class="chart-container"><canvas class="status-chart" id="statusChart"></canvas></div>
+<div class="legend">
+<div class="legend-item"><span class="success-dot"><span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></span></span><span class="legend-name">Successful</span><span class="legend-percent" id="successPercent">0%</span><span class="legend-count" id="successCount">0 events</span></div>
+<div class="legend-item"><span class="failed-dot"><span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></span></span><span class="legend-name">Failed</span><span class="legend-percent" id="failedPercent">0%</span><span class="legend-count" id="failedCount">0 events</span></div>
+</div>
+</div>
+</div>
+
+<div class="panel activity-panel">
+<h2>Activity Over Time</h2>
+<div class="activity-chart-wrap"><canvas class="activity-chart" id="activityChart"></canvas></div>
+<div class="activity-legend">
+<span><b class="activity-dot success-dot"><span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></span></b>Successful</span>
+<span><b class="activity-dot failed-dot"><span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></span></b>Failed</span>
+</div>
+<div class="activity-note">Events are grouped by minute from the analyzed log timestamps.</div>
+</div>
+
+<div class="panel">
+<h2>Security Events</h2>
+<div id="eventsList"></div>
+</div>
+
+<div class="panel">
+<h2>IP Activity</h2>
+<div class="table-wrapper">
+<table>
+<thead><tr><th>IP Address</th><th>Requests</th><th>Failed</th><th>Status</th></tr></thead>
+<tbody id="ipTable"></tbody>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- USER MANUAL -->
+<div id="manualModal" class="manual-modal">
+<div class="manual-content">
+<div class="manual-header"><h2>📖 User Manual</h2><button onclick="closeManual()" class="manual-close" type="button">✕</button></div>
+<div class="manual-body">
+<h3>1. 📁 Select a Log</h3>
+<p>Tap <b>Choose Log File</b> and select a text-based <b>.log</b> or <b>.txt</b> file from your device. You can also use <b>Load Demo Log</b> to test the analyzer.</p>
+<h3>2. 🔍 Analyze the Log</h3>
+<p>Tap <b>Analyze Log</b> to calculate total requests, failed requests, unique IP addresses, security events, request status percentages, and activity over time.</p>
+<h3>3. 🚨 Brute-Force Detection</h3>
+<p>CyberShield checks repeated failed requests from the same IP address. When one IP reaches <b>70 or more failed requests</b>, the Request Status panel changes to <b>Brute Force Attempt Detected</b>.</p>
+<p>This is a detection signal based on the analyzed log and should be investigated rather than treated as absolute proof of an attack.</p>
+<h3>4. 📄 Supported Log Format</h3>
+<p>CyberShield analyzes plain-text server and web access logs. <b>Apache-style access logs are recommended.</b></p>
+<p>The log should contain an IP address, date and time, HTTP request, and HTTP status code.</p>
+<p><b>Supported timestamp formats include:</b></p>
+<pre>01/Sep/2026:10:15:02 +0530</pre>
+<pre>[2026-09-01 10:15:02]</pre>
+<pre>2026-09-01 10:15:02</pre>
+<pre>01/Sep/2026 10:15:02</pre>
+<p><b>Recommended example:</b></p>
+<pre>192.168.1.10 - - [01/Sep/2026:10:15:02 +0530] "GET /login HTTP/1.1" 200 512</pre>
+<p>The analyzer uses recognizable IP addresses, timestamps, HTTP requests, and status codes to calculate statistics, analyze activity, identify repeated failed requests, and detect possible security events.</p>
+</div>
+</div>
+</div>
+
+<script>
+"use strict";
+
+let selectedLog="";
+let lastActivity={};
+
+const demoLog=`192.168.1.10 - - [01/Sep/2026:10:15:02 +0530] "GET / HTTP/1.1" 200 1240
+192.168.1.11 - - [01/Sep/2026:10:15:04 +0530] "GET /login HTTP/1.1" 200 980
+203.0.113.25 - - [01/Sep/2026:10:15:08 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:09 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:10 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:11 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:12 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:13 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:15:14 +0530] "POST /login HTTP/1.1" 401 410
+198.51.100.40 - - [01/Sep/2026:10:16:01 +0530] "GET /dashboard HTTP/1.1" 200 3200
+198.51.100.40 - - [01/Sep/2026:10:16:02 +0530] "GET /profile HTTP/1.1" 200 2100
+198.51.100.40 - - [01/Sep/2026:10:16:03 +0530] "GET /settings HTTP/1.1" 404 520
+198.51.100.40 - - [01/Sep/2026:10:16:04 +0530] "GET /admin HTTP/1.1" 403 610
+192.168.1.10 - - [01/Sep/2026:10:16:20 +0530] "GET /reports HTTP/1.1" 500 760
+192.168.1.11 - - [01/Sep/2026:10:16:25 +0530] "GET /help HTTP/1.1" 200 1450
+203.0.113.25 - - [01/Sep/2026:10:16:30 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:16:31 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:16:32 +0530] "POST /login HTTP/1.1" 401 410
+203.0.113.25 - - [01/Sep/2026:10:16:33 +0530] "POST /login HTTP/1.1" 401 410`;
+
+const logFile=document.getElementById("logFile");
+const fileName=document.getElementById("fileName");
+const demoButton=document.getElementById("demoButton");
+const analyzeButton=document.getElementById("analyzeButton");
+
+logFile.addEventListener("change",function(event){
+    const file=event.target.files&&event.target.files[0];
+    if(!file)return;
+    fileName.textContent="Reading: "+file.name;
+    const reader=new FileReader();
+    reader.onload=function(e){
+        selectedLog=String(e.target.result||"");
+        fileName.textContent="Selected: "+file.name+" ✔";
+    };
+    reader.onerror=function(){
+        selectedLog="";
+        fileName.textContent="Could not read the file.";
+    };
+    reader.readAsText(file);
+});
+
+demoButton.addEventListener("click",function(){
+    selectedLog=demoLog;
+    fileName.textContent="Demo log loaded ✔";
+    document.getElementById("results").style.display="none";
+});
+
+analyzeButton.addEventListener("click",function(){analyzeLog()});
+
+function getStatus(line){
+    let match=line.match(/"\s*(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+.*?"\s+(\d{3})(?:\s|$)/i);
+    if(match)return parseInt(match[1],10);
+    match=line.match(/\b(?:GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS)\s+\S+(?:\s+HTTP\/[\d.]+)?\s+(\d{3})(?:\s|$)/i);
+    if(match)return parseInt(match[1],10);
+    return 0;
+}
+
+function getMinuteLabel(line){
+    let match=line.match(/\[(\d{2}\/[A-Za-z]{3}\/\d{4}):(\d{2}):(\d{2}):(\d{2})/);
+    if(match)return{key:match[1]+" "+match[2]+":"+match[3],label:match[2]+":"+match[3]};
+    match=line.match(/\[(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+    if(match)return{key:match[1]+" "+match[2]+":"+match[3],label:match[2]+":"+match[3]};
+    match=line.match(/\b(\d{4}-\d{2}-\d{2})[ T](\d{2}):(\d{2}):(\d{2})\b/);
+    if(match)return{key:match[1]+" "+match[2]+":"+match[3],label:match[2]+":"+match[3]};
+    match=line.match(/\b(\d{2}\/[A-Za-z]{3}\/\d{4})[ T](\d{2}):(\d{2}):(\d{2})\b/);
+    if(match)return{key:match[1]+" "+match[2]+":"+match[3],label:match[2]+":"+match[3]};
+    return null;
+}
+
+function analyzeLog(){
+    if(!selectedLog.trim()){
+        alert("Please choose a log file or load the demo log first.");
+        return;
+    }
+
+    const lines=selectedLog.split(/\r?\n/).map(function(line){return line.trim()}).filter(function(line){return line!==""});
+    const total=lines.length;
+    let failed=0;
+    let successful=0;
+    const ipData={};
+    const events=[];
+    const activity={};
+
+    lines.forEach(function(line){
+        const ipMatch=line.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
+        const ip=ipMatch?ipMatch[0]:"Unknown";
+        const status=getStatus(line);
+
+        if(!ipData[ip])ipData[ip]={requests:0,failed:0};
+        ipData[ip].requests++;
+
+        let isSuccess=false;
+        let isFailed=false;
+
+        if(/\bLOGIN_SUCCESS\b/i.test(line)){
+            successful++;isSuccess=true;
+        }else if(/\bLOGIN_FAILED\b/i.test(line)){
+            failed++;isFailed=true;ipData[ip].failed++;
+        }else if(status>=200&&status<400){
+            successful++;isSuccess=true;
+        }else if(status>=400&&status<=599){
+            failed++;isFailed=true;ipData[ip].failed++;
+        }
+
+        const timeInfo=getMinuteLabel(line);
+        if(timeInfo){
+            if(!activity[timeInfo.key])activity[timeInfo.key]={label:timeInfo.label,success:0,failed:0};
+            if(isSuccess)activity[timeInfo.key].success++;
+            if(isFailed)activity[timeInfo.key].failed++;
+        }
+    });
+
+    Object.keys(ipData).forEach(function(ip){
+        const data=ipData[ip];
+        if(data.failed>=70){
+            events.push({type:"danger",title:"Repeated failed authentication activity",description:ip+" generated "+data.failed+" failed requests."});
+        }else if(data.failed>=2){
+            events.push({type:"warning",title:"Multiple failed requests",description:ip+" generated "+data.failed+" failed requests."});
+        }
+    });
+
+    let serverErrors=0;
+    let forbidden=0;
+    let requestSpikes=0;
+    let unknownAgents=0;
+    let fileAccess=0;
+
+    lines.forEach(function(line){
+        const status=getStatus(line);
+        if(status>=500)serverErrors++;
+        if(status===403)forbidden++;
+        if(/\bREQUEST_SPIKE\b/i.test(line))requestSpikes++;
+        if(/\bUSER_AGENT_UNKNOWN\b/i.test(line))unknownAgents++;
+        if(/\bFILE_ACCESS\b/i.test(line))fileAccess++;
+    });
+
+    if(requestSpikes>0)events.push({type:"warning",title:"Request spike detected",description:requestSpikes+" request-spike event(s) were found."});
+    if(unknownAgents>0)events.push({type:"warning",title:"Unknown user agent detected",description:unknownAgents+" request(s) used an unknown user agent."});
+    if(fileAccess>0)events.push({type:"warning",title:"Sensitive file access detected",description:fileAccess+" file-access event(s) were found."});
+    if(serverErrors>0)events.push({type:"warning",title:"Server errors detected",description:serverErrors+" HTTP 5xx response(s) were found."});
+    if(forbidden>0)events.push({type:"warning",title:"Forbidden requests detected",description:forbidden+" HTTP 5xx response(s) were found."});
+    if(forbidden>0)events.push({type:"warning",title:"Forbidden requests detected",description:forbidden+" HTTP 403 response(s) were found."});
+
+    document.getElementById("totalRequests").textContent=total;
+    document.getElementById("failedRequests").textContent=failed;
+    document.getElementById("uniqueIPs").textContent=Object.keys(ipData).filter(function(ip){return ip!=="Unknown"}).length;
+    document.getElementById("securityEvents").textContent=events.length;
+
+    renderEvents(events);
+    renderIPTable(ipData);
+    updateBruteForceStatus(ipData);
+    updateDonutChart(successful,failed);
+    lastActivity=activity;
+    drawActivityGraph(activity);
+
+    document.getElementById("results").style.display="block";
+}
+
+function renderEvents(events){
+    const list=document.getElementById("eventsList");
+    list.innerHTML="";
+    if(events.length===0){
+        const div=document.createElement("div");
+        div.className="event";
+        const strong=document.createElement("strong");
+        strong.textContent="✔ No obvious security patterns detected";
+        const span=document.createElement("span");
+        span.textContent="The analyzer did not find any configured warning patterns.";
+        div.appendChild(strong);div.appendChild(span);list.appendChild(div);return;
+    }
+    events.forEach(function(event){
+        const div=document.createElement("div");div.className="event "+event.type;
+        const strong=document.createElement("strong");strong.textContent=event.title;
+        const span=document.createElement("span");span.textContent=event.description;
+        div.appendChild(strong);div.appendChild(span);list.appendChild(div);
+    });
+}
+
+function renderIPTable(ipData){
+    const table=document.getElementById("ipTable");
+    table.innerHTML="";
+    const ips=Object.keys(ipData).sort(function(a,b){return ipData[b].failed-ipData[a].failed});
+    ips.forEach(function(ip){
+        const data=ipData[ip];
+        const row=document.createElement("tr");
+        const ipCell=document.createElement("td");ipCell.textContent=ip;
+        const reqCell=document.createElement("td");reqCell.textContent=data.requests;
+        const failCell=document.createElement("td");failCell.textContent=data.failed;
+        const statusCell=document.createElement("td");
+        statusCell.textContent=data.failed>=70?"⚠ Suspicious":data.failed>=2?"⚠ Monitor":"Normal";
+        row.appendChild(ipCell);row.appendChild(reqCell);row.appendChild(failCell);row.appendChild(statusCell);table.appendChild(row);
+    });
+}
+
+function updateBruteForceStatus(ipData){
+    let suspiciousIP="";
+    let maxFailed=0;
+    Object.keys(ipData).forEach(function(ip){
+        const count=ipData[ip].failed;
+        if(ip!=="Unknown"&&count>=70&&count>maxFailed){suspiciousIP=ip;maxFailed=count;}
+    });
+
+    const box=document.getElementById("bruteStatus");
+    const title=document.getElementById("bruteTitle");
+    const detail=document.getElementById("bruteDetail");
+    const icon=box.querySelector(".status-icon");
+
+    if(suspiciousIP){
+        box.className="brute-status brute-danger";
+        icon.textContent="🚨";
+        title.textContent="Brute Force Attempt Detected";
+        detail.textContent=suspiciousIP+" generated "+maxFailed+" failed requests. This exceeds the 70-attempt detection threshold.";
+    }else{
+        box.className="brute-status brute-safe";
+        icon.textContent="🛡️";
+        title.textContent="No Brute Force Activity Detected";
+        detail.textContent="No IP reached the 70 failed-attempt detection threshold in this log.";
+    }
+}
+
+function updateDonutChart(successful,failed){
+    const canvas=document.getElementById("statusChart");
+    const ctx=canvas.getContext("2d");
+    const size=Math.max(220,Math.min(canvas.parentElement.clientWidth||300,300));
+    const dpr=window.devicePixelRatio||1;
+
+    canvas.width=size*dpr;
+    canvas.height=size*dpr;
+    canvas.style.width=size+"px";
+    canvas.style.height=size+"px";
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,size,size);
+
+    const total=successful+failed;
+    const successPercent=total?Math.round(successful/total*100):0;
+    const failedPercent=total?100-successPercent:0;
+
+    document.getElementById("successPercent").textContent=successPercent+"%";
+    document.getElementById("failedPercent").textContent=failedPercent+"%";
+    document.getElementById("successCount").textContent=successful+" events";
+    document.getElementById("failedCount").textContent=failed+" events";
+
+    const center=size/2;
+    const radius=size*.34;
+    const lineWidth=Math.max(25,size*.105);
+    const start=-Math.PI/2;
+    const gap=total>0?0.045:0;
+
+    /* Soft outer glow */
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center,center,radius,0,Math.PI*2);
+    ctx.lineWidth=lineWidth+10;
+    ctx.strokeStyle="rgba(0,217,255,.035)";
+    ctx.shadowBlur=24;
+    ctx.shadowColor="rgba(0,217,255,.22)";
+    ctx.stroke();
+    ctx.restore();
+
+    /* Dark track */
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center,center,radius,0,Math.PI*2);
+    ctx.lineWidth=lineWidth;
+    ctx.strokeStyle="#152437";
+    ctx.lineCap="round";
+    ctx.stroke();
+    ctx.restore();
+
+    if(total>0){
+        const successAngle=(successful/total)*Math.PI*2;
+        const failedAngle=Math.PI*2-successAngle;
+
+        /* Successful segment */
+        if(successful>0){
+            const a1=start+gap/2;
+            const a2=start+successAngle-gap/2;
+
+            const successGrad=ctx.createLinearGradient(
+                center-radius,center-radius,
+                center+radius,center+radius
+            );
+            successGrad.addColorStop(0,"#00ffb3");
+            successGrad.addColorStop(.55,"#00ff9d");
+            successGrad.addColorStop(1,"#00c982");
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(center,center,radius,a1,a2);
+            ctx.lineWidth=lineWidth;
+            ctx.lineCap="round";
+            ctx.strokeStyle=successGrad;
+            ctx.shadowBlur=15;
+            ctx.shadowColor="rgba(0,255,157,.42)";
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* Failed segment */
+        if(failed>0){
+            const a1=start+successAngle+gap/2;
+            const a2=start+Math.PI*2-gap/2;
+
+            const failedGrad=ctx.createLinearGradient(
+                center+radius,center-radius,
+                center-radius,center+radius
+            );
+            failedGrad.addColorStop(0,"#ff6b86");
+            failedGrad.addColorStop(.55,"#ff4d6d");
+            failedGrad.addColorStop(1,"#d93657");
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(center,center,radius,a1,a2);
+            ctx.lineWidth=lineWidth;
+            ctx.lineCap="round";
+            ctx.strokeStyle=failedGrad;
+            ctx.shadowBlur=15;
+            ctx.shadowColor="rgba(255,77,109,.35)";
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    /* Inner glass/dark circle */
+    const innerRadius=radius-lineWidth*.72;
+    const innerGrad=ctx.createRadialGradient(
+        center,center,8,
+        center,center,innerRadius
+    );
+    innerGrad.addColorStop(0,"#102033");
+    innerGrad.addColorStop(1,"#071321");
+
+    ctx.beginPath();
+    ctx.arc(center,center,innerRadius,0,Math.PI*2);
+    ctx.fillStyle=innerGrad;
+    ctx.fill();
+
+    /* Fine inner ring */
+    ctx.beginPath();
+    ctx.arc(center,center,innerRadius,0,Math.PI*2);
+    ctx.lineWidth=1;
+    ctx.strokeStyle="rgba(255,255,255,.07)";
+    ctx.stroke();
+
+    /* Center text */
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.fillStyle="#ffffff";
+    ctx.font="800 "+Math.max(36,size*.17)+"px Segoe UI, Arial";
+    ctx.shadowBlur=14;
+    ctx.shadowColor="rgba(255,255,255,.12)";
+    ctx.fillText(String(total),center,center-10);
+
+    ctx.shadowBlur=0;
+    ctx.fillStyle="#8fa4b8";
+    ctx.font="600 "+Math.max(11,size*.045)+"px Segoe UI, Arial";
+    ctx.fillText("TOTAL EVENTS",center,center+25);
+
+    /* Tiny decorative accent */
+    ctx.beginPath();
+    ctx.arc(center,center,innerRadius+7,-Math.PI/2,-Math.PI/2+.32);
+    ctx.lineWidth=2;
+    ctx.strokeStyle="rgba(0,217,255,.55)";
+    ctx.lineCap="round";
+    ctx.stroke();
+}
+
+let activityChartInstance=null;
+
+function drawActivityGraph(activity){
+    const canvas=document.getElementById("activityChart");
+    const keys=Object.keys(activity).sort();
+
+    if(activityChartInstance){
+        activityChartInstance.destroy();
+        activityChartInstance=null;
+    }
+
+    if(keys.length===0){
+        const ctx=canvas.getContext("2d");
+        const wrapper=canvas.parentElement;
+        const dpr=window.devicePixelRatio||1;
+        const width=Math.max(wrapper.clientWidth-16,280);
+        const height=Math.max(wrapper.clientHeight-16,210);
+        canvas.width=width*dpr;canvas.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+        ctx.clearRect(0,0,width,height);
+        ctx.fillStyle="#7f90a4";ctx.font="15px Segoe UI, Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+        ctx.fillText("No timestamps found",width/2,height/2);
+        return;
+    }
+
+    const labels=keys.map(function(key){return activity[key].label});
+    const successData=keys.map(function(key){return activity[key].success});
+    const failedData=keys.map(function(key){return activity[key].failed});
+
+    const ctx=canvas.getContext("2d");
+
+    const successGrad=ctx.createLinearGradient(0,0,0,260);
+    successGrad.addColorStop(0,"#00ff9d");
+    successGrad.addColorStop(1,"#00a86b");
+
+    const failedGrad=ctx.createLinearGradient(0,0,0,260);
+    failedGrad.addColorStop(0,"#ff6b81");
+    failedGrad.addColorStop(1,"#c9304a");
+
+    activityChartInstance=new Chart(canvas,{
+        type:"bar",
+        data:{
+            labels:labels,
+            datasets:[
+                {
+                    label:"Successful",
+                    data:successData,
+                    backgroundColor:successGrad,
+                    borderRadius:8,
+                    borderSkipped:false,
+                    maxBarThickness:34
+                },
+                {
+                    label:"Failed",
+                    data:failedData,
+                    backgroundColor:failedGrad,
+                    borderRadius:8,
+                    borderSkipped:false,
+                    maxBarThickness:34
+                }
+            ]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            animation:{duration:600,easing:"easeOutQuart"},
+            layout:{padding:{top:20,right:10,left:4,bottom:0}},
+            plugins:{
+                legend:{display:false},
+                tooltip:{
+                    backgroundColor:"#0b1724",
+                    borderColor:"#294158",
+                    borderWidth:1,
+                    padding:10,
+                    titleColor:"#f5f7fa",
+                    bodyColor:"#c8d2de",
+                    titleFont:{weight:"700"},
+                    displayColors:true,
+                    boxPadding:4
+                }
+            },
+            scales:{
+                x:{
+                    grid:{display:false,drawBorder:false},
+                    ticks:{color:"#9eacbf",font:{size:11,weight:"600"}}
+                },
+                y:{
+                    beginAtZero:true,
+                    grid:{color:"rgba(129,153,178,.18)",drawBorder:false},
+                    ticks:{color:"#7f90a4",font:{size:11},stepSize:1,precision:0},
+                    title:{display:true,text:"Events",color:"#5d6d81",font:{size:10,weight:"700"}}
+                }
+            }
+        }
+    });
+}
+
+function openManual(){document.getElementById("manualModal").style.display="flex"}
+function closeManual(){document.getElementById("manualModal").style.display="none"}
+
+document.getElementById("manualModal").addEventListener("click",function(event){if(event.target===this)closeManual()});
+document.addEventListener("keydown",function(event){if(event.key==="Escape")closeManual()});
+
+window.addEventListener("resize",function(){
+    if(document.getElementById("results").style.display!=="none"){
+        drawActivityGraph(lastActivity);
+    }
+});
+</script>
+<style id="cybershield-svg-ui">
+/* Inline SVG replacement for UI emoji/icons. */
+.cs-svg-icon{
+    width:1.15em;
+    height:1.15em;
+    display:inline-block;
+    vertical-align:-.18em;
+    flex:0 0 auto;
+}
+.cs-svg-icon svg{
+    width:100%;
+    height:100%;
+    display:block;
+}
+</style>
+<script>
+(function(){
+    const ICONS = {
+        "🛡":"shield","⚠":"warning","🔗":"link","🚨":"alert","✓":"check",
+        "🔎":"search","🔒":"lock","🔐":"lock","🚫":"blocked","🧩":"puzzle",
+        "♻":"recycle","📁":"folder","📄":"file","📊":"chart","📖":"book",
+        "🔍":"search","✕":"x","✔":"check","❌":"x","🟡":"dot"
+    };
+
+    function svgFor(name){
+        const common = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+        const paths = {
+            shield:'<path '+common+' d="M12 3l7 3v5c0 4.7-2.8 7.8-7 10-4.2-2.2-7-5.3-7-10V6l7-3z"/><path '+common+' d="M9 12l2 2 4-4"/>',
+            warning:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            link:'<path '+common+' d="M10 13.5l4-4"/><path '+common+' d="M8.5 16H7a4 4 0 010-8h3"/><path '+common+' d="M15.5 8H17a4 4 0 010 8h-3"/>',
+            alert:'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+            check:'<path '+common+' d="M5 12l4 4L19 6"/>',
+            search:'<circle '+common+' cx="10.5" cy="10.5" r="6.5"/><path '+common+' d="M16 16l5 5"/>',
+            lock:'<rect '+common+' x="5" y="10" width="14" height="10" rx="2"/><path '+common+' d="M8 10V7a4 4 0 018 0v3"/>',
+            blocked:'<circle '+common+' cx="12" cy="12" r="8"/><path '+common+' d="M7 7l10 10"/>',
+            puzzle:'<path '+common+' d="M9 5h3a2 2 0 114 0v1h3v5a2 2 0 110 4v4h-5a2 2 0 110-4H9v-3a2 2 0 110-4V5z"/>',
+            recycle:'<path '+common+' d="M8 7l2-3 3 1"/><path '+common+' d="M10 4l2 4H8"/><path '+common+' d="M17 9l3 2-1 3"/><path '+common+' d="M20 11l-5 1 2-4"/><path '+common+' d="M8 17l-1 3-3-1"/><path '+common+' d="M7 20l3-4 2 4"/>',
+            folder:'<path '+common+' d="M3 7h7l2 2h9v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+            file:'<path '+common+' d="M6 3h8l4 4v14H6z"/><path '+common+' d="M14 3v5h5"/>',
+            chart:'<path '+common+' d="M5 19V9M12 19V5M19 19v-7"/><path '+common+' d="M3 21h18"/>',
+            book:'<path '+common+' d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4V4z"/><path '+common+' d="M9 20V8a4 4 0 014-4"/>',
+            x:'<path '+common+' d="M6 6l12 12M18 6L6 18"/>',
+            dot:'<circle cx="12" cy="12" r="5" fill="currentColor"/>'
+        };
+        return '<span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+(paths[name]||paths.shield)+'</svg></span>';
+    }
+
+    function replaceTextNode(node){
+        if(!node.nodeValue || !/[🛡⚠🔗🚨✓🔎🔒🔐🚫🧩♻📁📄📊📖🔍✕✔❌🟡]/u.test(node.nodeValue)) return;
+        const parent=node.parentNode;
+        if(!parent || /^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(parent.nodeName)) return;
+
+        const text=node.nodeValue;
+        const frag=document.createDocumentFragment();
+        let last=0;
+        const re=/🛡|⚠|🔗|🚨|✓|🔎|🔒|🔐|🚫|🧩|♻|📁|📄|📊|📖|🔍|✕|✔|❌|🟡/gu;
+        let m;
+        while((m=re.exec(text))){
+            if(m.index>last) frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+            const holder=document.createElement("span");
+            holder.innerHTML=svgFor(ICONS[m[0]]);
+            frag.appendChild(holder.firstElementChild);
+            last=re.lastIndex;
+        }
+        if(last<text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        parent.replaceChild(frag,node);
+    }
+
+    function scan(root){
+        const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+            acceptNode:function(n){
+                const p=n.parentNode;
+                return p && !/^(SCRIPT|STYLE)$/i.test(p.nodeName)
+                    ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+            }
+        });
+        const nodes=[];
+        let n;
+        while((n=walker.nextNode())) nodes.push(n);
+        nodes.forEach(replaceTextNode);
+    }
+
+    function init(){
+        scan(document.body);
+        const observer=new MutationObserver(function(records){
+            records.forEach(function(record){
+                record.addedNodes.forEach(function(node){
+                    if(node.nodeType===Node.TEXT_NODE) replaceTextNode(node);
+                    else if(node.nodeType===Node.ELEMENT_NODE) scan(node);
+                });
+            });
+        });
+        observer.observe(document.body,{childList:true,subtree:true});
+    }
+
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+    else init();
+})();
+</script>
+
+</body>
+</html>

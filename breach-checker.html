@@ -1,0 +1,572 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Breach Checker • CyberShield</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#020914;color:#f5f7fa;font-family:Segoe UI,Arial,sans-serif}
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.wrap{max-width:850px;margin:auto;padding:0 20px 50px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid #17283a}
+.logo{font-size:27px;font-weight:800}
+.logo span{color:#00ff9d}
+.small{color:#7f8da0;font-size:13px}
+.hero{text-align:center;padding:45px 10px 30px}
+.badge{display:inline-block;border:1px solid #00d9ff;color:#00d9ff;border-radius:30px;padding:9px 17px;font-weight:700;font-size:13px}
+h1{font-size:43px;line-height:1.1;margin:20px 0 14px}
+h1 span{color:#00d9ff}
+p{color:#9eacbf;line-height:1.7}
+.card{background:#071321;border:1px solid #193047;border-radius:20px;padding:28px;margin-top:20px}
+.search-row{display:flex;gap:10px;flex-wrap:wrap}
+input[type=email]{flex:1;min-width:220px;padding:14px;border-radius:10px;border:1px solid #294158;background:#020914;color:white;font-size:15px}
+.btn{padding:14px 24px;border-radius:10px;background:#00ff9d;color:#03130c;font-weight:800;border:0;cursor:pointer;font-size:14px;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.hint{color:#5d6d81;font-size:12px;margin-top:10px}
+.loading{display:none;text-align:center;padding:30px 0;color:#7f90a4}
+.loading.show{display:block}
+.spinner{width:34px;height:34px;border:3px solid #193047;border-top-color:#00d9ff;border-radius:50%;margin:0 auto 14px;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result{display:none}
+.result.show{display:block}
+.status-hero{text-align:center;padding:20px 0}
+.status-hero .big-icon{display:flex;justify-content:center;margin-bottom:6px}
+.status-hero .big-icon svg{width:56px;height:56px}
+.status-hero h2{font-size:26px;margin:10px 0 6px}
+.status-hero.safe h2{color:#00ff9d}
+.status-hero.exposed h2{color:#ff6b81}
+
+@keyframes fadeSlideUp{
+    from{opacity:0;transform:translateY(14px)}
+    to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeIn{
+    from{opacity:0}
+    to{opacity:1}
+}
+@keyframes popIn{
+    0%{opacity:0;transform:scale(.85)}
+    100%{opacity:1;transform:scale(1)}
+}
+
+.result.show{animation:fadeSlideUp .5s ease both}
+.status-hero .big-icon svg{animation:popIn .45s cubic-bezier(.34,1.56,.64,1) both}
+.risk-row.show-anim .risk-box{animation:fadeSlideUp .4s ease both}
+.risk-row.show-anim .risk-box:nth-child(2){animation-delay:.08s}
+.breach-item{opacity:0;animation:fadeSlideUp .45s ease forwards}
+.chart-card.show-anim{animation:fadeIn .5s ease both}
+.risk-row{display:flex;gap:14px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.risk-box{background:#020914;border:1px solid #193047;border-radius:14px;padding:16px 22px;text-align:center;min-width:120px}
+.risk-num{font-size:24px;font-weight:900}
+.risk-num.low{color:#00ff9d}
+.risk-num.medium{color:#ffb020}
+.risk-num.high{color:#ff4668}
+.risk-label{font-size:11px;color:#718095;letter-spacing:.5px;margin-top:4px}
+.breach-list{margin-top:20px}
+.breach-item{background:#020914;border:1px solid #193047;border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.breach-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.breach-name{font-weight:800;font-size:15px}
+.breach-year{color:#5d6d81;font-size:12px}
+.breach-desc{color:#9eacbf;font-size:13px;line-height:1.6;margin-top:8px}
+.breach-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{background:#122234;border:1px solid #294158;color:#9eacbf;border-radius:20px;padding:4px 10px;font-size:11px}
+.chart-card canvas{max-height:220px}
+.error-box{display:none;background:#2a0d13;border:1px solid #ff4668;border-radius:14px;padding:16px 18px;margin-top:18px;color:#ffd4dc;font-size:14px}
+.error-box.show{display:block}
+.disclaimer{color:#5d6d81;font-size:12px;text-align:center;margin-top:16px}
+.section-label{font-size:11px;letter-spacing:1.4px;color:#5d6d81;text-transform:uppercase;margin:8px 0 0;text-align:center;border-top:1px solid #193047;padding-top:24px}
+.darkweb-hero{padding-top:6px}
+.icon-svg{display:inline-flex;vertical-align:middle}
+.logo .icon-svg{width:24px;height:24px;color:#00ff9d;margin-right:2px}
+[data-glow]{position:relative;overflow:hidden}
+[data-glow]::before{content:"";position:absolute;inset:-2px;border-radius:inherit;background:radial-gradient(160px circle at var(--gx,50%) var(--gy,50%),rgba(0,255,157,.40),transparent 70%);opacity:0;transition:opacity .25s ease;pointer-events:none}
+[data-glow]:hover::before{opacity:1}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<script>
+(function(){
+    const canvas = document.getElementById("bgCanvas");
+    const ctx = canvas.getContext("2d");
+    let width, height, particles;
+
+    function resize(){
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function createParticles(){
+        const count = Math.min(70, Math.floor((width*height)/18000));
+        particles = [];
+        for(let i=0;i<count;i++){
+            particles.push({
+                x: Math.random()*width,
+                y: Math.random()*height,
+                vx: (Math.random()-0.5)*0.25,
+                vy: (Math.random()-0.5)*0.25,
+                r: Math.random()*1.6+0.6
+            });
+        }
+    }
+
+    function step(){
+        ctx.clearRect(0,0,width,height);
+
+        for(let i=0;i<particles.length;i++){
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > width) p.vx *= -1;
+            if(p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = "rgba(0,217,255,0.55)";
+            ctx.fill();
+        }
+
+        for(let i=0;i<particles.length;i++){
+            for(let j=i+1;j<particles.length;j++){
+                const a = particles[i], b = particles[j];
+                const dx = a.x-b.x, dy = a.y-b.y;
+                const dist = Math.sqrt(dx*dx+dy*dy);
+                if(dist < 130){
+                    ctx.beginPath();
+                    ctx.moveTo(a.x,a.y);
+                    ctx.lineTo(b.x,b.y);
+                    ctx.strokeStyle = "rgba(0,255,157," + (0.12*(1-dist/130)) + ")";
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(step);
+    }
+
+    resize();
+    createParticles();
+    step();
+
+    window.addEventListener("resize", function(){
+        resize();
+        createParticles();
+    });
+})();
+</script>
+
+<div class="wrap">
+
+<div class="top">
+    <div class="logo"><svg class="icon-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l7 3v6c0 5-3.2 8.3-7 9.8-3.8-1.5-7-4.8-7-9.8v-6l7-3z"/></svg> Cyber<span>Shield</span></div>
+    <div class="small">DATA BREACH CHECKER</div>
+</div>
+
+<section class="hero">
+<div class="badge">REAL-TIME BREACH + DARK WEB LOOKUP</div>
+<h1>Has Your Email Been <span>Exposed?</span></h1>
+<p>
+    Checks your email against a live database of over 11 billion breached
+    records, plus dark web paste dumps. Find out where, when, and what was leaked.
+</p>
+</section>
+
+<div class="card">
+<div class="search-row">
+    <input type="email" id="emailInput" placeholder="Enter an email address">
+    <button class="btn" id="checkBtn" type="button" data-glow>Check Now</button>
+</div>
+<p class="hint">Your email is sent directly to the XposedOrNot public breach database — CyberShield does not store it.</p>
+
+<div class="loading" id="loadingBox">
+    <div class="spinner"></div>
+    Checking breach records…
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<div class="result" id="resultBox">
+
+    <div class="status-hero" id="statusHero">
+        <div class="big-icon" id="statusIcon"></div>
+        <h2 id="statusTitle">No Breaches Found</h2>
+        <p id="statusSubtitle">This email doesn't appear in any known breach.</p>
+    </div>
+
+    <div class="risk-row" id="riskRow" style="display:none">
+        <div class="risk-box">
+            <div class="risk-num" id="riskScore">-</div>
+            <div class="risk-label">RISK SCORE</div>
+        </div>
+        <div class="risk-box">
+            <div class="risk-num" id="breachCount">-</div>
+            <div class="risk-label">BREACHES FOUND</div>
+        </div>
+    </div>
+
+    <div class="breach-list" id="breachList"></div>
+
+    <div class="section-label">Dark Web Monitor</div>
+    <div class="status-hero darkweb-hero" id="darkwebHero">
+        <div class="big-icon" id="darkwebIcon"></div>
+        <h2 id="darkwebTitle">—</h2>
+        <p id="darkwebSubtitle"></p>
+    </div>
+    <div class="breach-list" id="darkwebList"></div>
+
+</div>
+
+</div>
+
+<div class="card chart-card" id="chartCard" style="display:none">
+<h3 style="margin-top:0">Breaches Over Time</h3>
+<canvas id="yearChart"></canvas>
+</div>
+
+<div class="card">
+<h3 style="margin-top:0">What counts as a "breach"?</h3>
+<p style="margin-top:0">
+    A breach means a company or website you had an account with was hacked,
+    and your information (email, password, or other details) ended up in
+    a leaked dataset that's now circulating publicly or on hacker forums.
+</p>
+<p>
+    If your email shows up here, it doesn't mean you're hacked right now —
+    but it means you should change the password for that specific site,
+    and any other site where you reused the same password.
+</p>
+</div>
+
+<p class="disclaimer">
+    Powered by the free XposedOrNot public breach database. Results depend on their
+    indexed data and may not be fully exhaustive.
+</p>
+
+</div>
+
+<script>
+
+const ICON_SAFE =
+    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<path d="M12 2L20 5V11C20 16.5 16.5 20.5 12 22C7.5 20.5 4 16.5 4 11V5L12 2Z" stroke="#00ff9d" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M8.5 12L11 14.5L15.5 9.5" stroke="#00ff9d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '</svg>';
+
+const ICON_EXPOSED =
+    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+    '<path d="M12 2L20 5V11C20 16.5 16.5 20.5 12 22C7.5 20.5 4 16.5 4 11V5L12 2Z" stroke="#ff6b81" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M12 8V13" stroke="#ff6b81" stroke-width="2" stroke-linecap="round"/>' +
+    '<circle cx="12" cy="16.3" r="1.1" fill="#ff6b81"/>' +
+    '</svg>';
+
+let yearChartInstance = null;
+
+const checkBtn = document.getElementById("checkBtn");
+const emailInput = document.getElementById("emailInput");
+const loadingBox = document.getElementById("loadingBox");
+const errorBox = document.getElementById("errorBox");
+const resultBox = document.getElementById("resultBox");
+const chartCard = document.getElementById("chartCard");
+
+function isValidEmail(email){
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function resetUI(){
+    errorBox.className = "error-box";
+    errorBox.textContent = "";
+    resultBox.className = "result";
+    chartCard.style.display = "none";
+}
+
+function showError(message){
+    errorBox.textContent = message;
+    errorBox.className = "error-box show";
+}
+
+async function checkBreach(){
+
+    const email = emailInput.value.trim();
+
+    if(!isValidEmail(email)){
+        showError("Please enter a valid email address.");
+        return;
+    }
+
+    resetUI();
+    loadingBox.className = "loading show";
+    checkBtn.disabled = true;
+
+    try{
+
+        const response = await fetch(
+            "https://api.xposedornot.com/v1/breach-analytics?email=" + encodeURIComponent(email)
+        );
+
+        if(!response.ok && response.status !== 404){
+            throw new Error("The breach database did not respond correctly (status " + response.status + ").");
+        }
+
+        const data = await response.json();
+
+        renderResult(data);
+
+    }catch(err){
+
+        showError(
+            "Couldn't reach the breach database. Check your internet connection and try again. (" + err.message + ")"
+        );
+
+    }finally{
+
+        loadingBox.className = "loading";
+        checkBtn.disabled = false;
+    }
+}
+
+function animateCount(el, target, duration){
+
+    const start = 0;
+    const startTime = performance.now();
+
+    function step(now){
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = Math.round(start + (target - start) * eased);
+        el.textContent = value;
+        if(progress < 1){
+            requestAnimationFrame(step);
+        }else{
+            el.textContent = target;
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
+function renderResult(data){
+
+    resultBox.className = "result show";
+
+    const hasBreaches =
+        data &&
+        data.ExposedBreaches &&
+        data.ExposedBreaches.breaches_details &&
+        data.ExposedBreaches.breaches_details.length > 0;
+
+    const statusHero = document.getElementById("statusHero");
+    const statusIcon = document.getElementById("statusIcon");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusSubtitle = document.getElementById("statusSubtitle");
+    const riskRow = document.getElementById("riskRow");
+    const breachList = document.getElementById("breachList");
+
+    breachList.innerHTML = "";
+
+    if(!hasBreaches){
+
+        statusHero.className = "status-hero safe";
+        statusIcon.innerHTML = ICON_SAFE;
+        statusTitle.textContent = "No Breaches Found";
+        statusSubtitle.textContent = "This email doesn't appear in any known breach in the XposedOrNot database.";
+        riskRow.style.display = "none";
+        chartCard.style.display = "none";
+        renderPasteMonitor(data);
+        return;
+    }
+
+    statusHero.className = "status-hero exposed";
+    statusIcon.innerHTML = ICON_EXPOSED;
+    statusTitle.textContent = "This Email Was Exposed";
+    statusSubtitle.textContent = "Found in " + data.ExposedBreaches.breaches_details.length + " known breach(es). Review the details below.";
+
+    renderPasteMonitor(data);
+
+    riskRow.style.display = "flex";
+    riskRow.classList.remove("show-anim");
+    void riskRow.offsetWidth;
+    riskRow.classList.add("show-anim");
+
+    let riskLabel = "Unknown";
+    let riskScoreValue = "-";
+    let riskClass = "medium";
+
+    if(data.BreachMetrics && data.BreachMetrics.risk && data.BreachMetrics.risk[0]){
+        riskLabel = data.BreachMetrics.risk[0].risk_label || "Unknown";
+        riskScoreValue = data.BreachMetrics.risk[0].risk_score;
+
+        if(riskLabel.toLowerCase() === "low") riskClass = "low";
+        else if(riskLabel.toLowerCase() === "high") riskClass = "high";
+        else riskClass = "medium";
+    }
+
+    const riskScoreEl = document.getElementById("riskScore");
+    riskScoreEl.className = "risk-num " + riskClass;
+
+    const numericRisk = parseInt(riskScoreValue, 10);
+    if(!isNaN(numericRisk)){
+        animateCount(riskScoreEl, numericRisk, 700);
+    }else{
+        riskScoreEl.textContent = riskScoreValue;
+    }
+
+    const breachCountEl = document.getElementById("breachCount");
+    animateCount(breachCountEl, data.ExposedBreaches.breaches_details.length, 500);
+
+    data.ExposedBreaches.breaches_details.forEach(function(breach, index){
+
+        const item = document.createElement("div");
+        item.className = "breach-item";
+        item.style.animationDelay = (index * 0.08) + "s";
+
+        const exposedTags = (breach.xposed_data || "")
+            .split(";")
+            .filter(Boolean)
+            .map(function(tag){ return '<span class="tag">' + tag + '</span>'; })
+            .join("");
+
+        item.innerHTML =
+            '<div class="breach-head">' +
+                '<span class="breach-name">' + (breach.breach || "Unknown") + '</span>' +
+                '<span class="breach-year">' + (breach.xposed_date || "") + ' • ' + (breach.xposed_records ? breach.xposed_records.toLocaleString() + ' records' : '') + '</span>' +
+            '</div>' +
+            '<div class="breach-desc">' + (breach.details || "") + '</div>' +
+            '<div class="breach-tags">' + exposedTags + '</div>';
+
+        breachList.appendChild(item);
+    });
+
+    renderYearChart(data.BreachMetrics ? data.BreachMetrics.yearwise_details : null);
+}
+
+function renderPasteMonitor(data){
+
+    // The same XposedOrNot breach-analytics response also carries paste-site
+    // exposure data (public paste dumps, a common dark-web leak vector).
+    // The exact key can vary slightly, so check the known shapes defensively.
+    const pastesArr =
+        (data && data.ExposedPastes && data.ExposedPastes.pastes_details) ||
+        (data && data.PastesSummary && data.PastesSummary.pastes_details) ||
+        [];
+
+    const hasPastes = Array.isArray(pastesArr) && pastesArr.length > 0;
+
+    const dwHero = document.getElementById("darkwebHero");
+    const dwIcon = document.getElementById("darkwebIcon");
+    const dwTitle = document.getElementById("darkwebTitle");
+    const dwSubtitle = document.getElementById("darkwebSubtitle");
+    const dwList = document.getElementById("darkwebList");
+
+    dwList.innerHTML = "";
+
+    if(!hasPastes){
+        dwHero.className = "status-hero safe darkweb-hero";
+        dwIcon.innerHTML = ICON_SAFE;
+        dwTitle.textContent = "No Dark Web Paste Activity Found";
+        dwSubtitle.textContent = "This email wasn't found in any known dark web paste dump indexed by XposedOrNot.";
+        return;
+    }
+
+    dwHero.className = "status-hero exposed darkweb-hero";
+    dwIcon.innerHTML = ICON_EXPOSED;
+    dwTitle.textContent = "Found in Dark Web Pastes";
+    dwSubtitle.textContent = "Detected in " + pastesArr.length + " paste dump(s) circulating on paste sites and dark web forums.";
+
+    pastesArr.forEach(function(paste, index){
+
+        const item = document.createElement("div");
+        item.className = "breach-item";
+        item.style.animationDelay = (index * 0.08) + "s";
+
+        const source = paste.source || paste.id || paste.title || "Unknown paste source";
+        const date = paste.date || paste.xposed_date || "";
+        const emailNote = paste.email ? '<div class="breach-desc">Email listed: ' + paste.email + '</div>' : "";
+
+        item.innerHTML =
+            '<div class="breach-head">' +
+                '<span class="breach-name">' + source + '</span>' +
+                '<span class="breach-year">' + date + '</span>' +
+            '</div>' +
+            emailNote;
+
+        dwList.appendChild(item);
+    });
+}
+
+function renderYearChart(yearData){
+
+    if(!yearData || !yearData[0]){
+        chartCard.style.display = "none";
+        return;
+    }
+
+    const yearObj = yearData[0];
+    const years = Object.keys(yearObj).map(function(k){ return k.replace("y",""); });
+    const counts = Object.values(yearObj);
+
+    const hasAnyData = counts.some(function(c){ return c > 0; });
+
+    if(!hasAnyData){
+        chartCard.style.display = "none";
+        return;
+    }
+
+    chartCard.style.display = "block";
+    chartCard.classList.remove("show-anim");
+    void chartCard.offsetWidth;
+    chartCard.classList.add("show-anim");
+
+    if(yearChartInstance){
+        yearChartInstance.destroy();
+    }
+
+    const ctx = document.getElementById("yearChart").getContext("2d");
+    const grad = ctx.createLinearGradient(0,0,0,220);
+    grad.addColorStop(0,"#00d9ff");
+    grad.addColorStop(1,"#0a4a63");
+
+    yearChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: years,
+            datasets: [{
+                label: "Breaches",
+                data: counts,
+                backgroundColor: grad,
+                borderRadius: 6,
+                borderSkipped: false,
+                maxBarThickness: 28
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display:false }, ticks: { color: "#9eacbf", font: { size: 10 } } },
+                y: { beginAtZero: true, grid: { color: "rgba(129,153,178,.18)" }, ticks: { color: "#7f90a4", stepSize: 1, precision: 0 } }
+            }
+        }
+    });
+}
+
+checkBtn.addEventListener("click", checkBreach);
+emailInput.addEventListener("keypress", function(e){
+    if(e.key === "Enter") checkBreach();
+});
+
+document.querySelectorAll('[data-glow]').forEach(function(el){
+    el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--gx', (e.clientX - r.left) + 'px');
+        el.style.setProperty('--gy', (e.clientY - r.top) + 'px');
+    });
+});
+
+</script>
+
+</body>
+</html>
