@@ -12,8 +12,6 @@ body{
     color:#f5f7fa;
     font-family:Segoe UI,Arial,sans-serif;
 }
-#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none}
-
 .wrap{
     max-width:850px;
     margin:auto;
@@ -248,78 +246,7 @@ input[type="file"]{
 }
 </style></head>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script><body>
-<canvas id="bgCanvas"></canvas>
-<script>
-(function(){
-    const canvas = document.getElementById("bgCanvas");
-    const ctx = canvas.getContext("2d");
-    let width, height, particles;
 
-    function resize(){
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-    }
-
-    function createParticles(){
-        const count = Math.min(70, Math.floor((width*height)/18000));
-        particles = [];
-        for(let i=0;i<count;i++){
-            particles.push({
-                x: Math.random()*width,
-                y: Math.random()*height,
-                vx: (Math.random()-0.5)*0.25,
-                vy: (Math.random()-0.5)*0.25,
-                r: Math.random()*1.6+0.6
-            });
-        }
-    }
-
-    function step(){
-        ctx.clearRect(0,0,width,height);
-
-        for(let i=0;i<particles.length;i++){
-            const p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-
-            if(p.x < 0 || p.x > width) p.vx *= -1;
-            if(p.y < 0 || p.y > height) p.vy *= -1;
-
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-            ctx.fillStyle = "rgba(0,217,255,0.55)";
-            ctx.fill();
-        }
-
-        for(let i=0;i<particles.length;i++){
-            for(let j=i+1;j<particles.length;j++){
-                const a = particles[i], b = particles[j];
-                const dx = a.x-b.x, dy = a.y-b.y;
-                const dist = Math.sqrt(dx*dx+dy*dy);
-                if(dist < 130){
-                    ctx.beginPath();
-                    ctx.moveTo(a.x,a.y);
-                    ctx.lineTo(b.x,b.y);
-                    ctx.strokeStyle = "rgba(0,255,157," + (0.12*(1-dist/130)) + ")";
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-        }
-
-        requestAnimationFrame(step);
-    }
-
-    resize();
-    createParticles();
-    step();
-
-    window.addEventListener("resize", function(){
-        resize();
-        createParticles();
-    });
-})();
-</script>
 <div class="wrap"><div class="top">
     <div class="logo">🛡️ Cyber<span>Shield</span></div>
     <div class="small">QR SHIELD</div>
