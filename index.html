@@ -375,7 +375,7 @@ button:active{
 @keyframes csIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ---------- Modal (fades + slides, never pops) ---------- */
-.cs-modal{position:fixed;inset:0 0 var(--cs-kb,0px) 0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;
+.cs-modal{position:fixed;inset:0 0 var(--cs-kb,0px) 0;height:auto;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;
   background:rgba(2,9,20,0);opacity:0;visibility:hidden;pointer-events:none;
   transition:opacity .3s ease,background .3s ease,visibility 0s linear .3s}
 .cs-modal.open{background:rgba(2,9,20,.82);opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
@@ -1239,6 +1239,8 @@ function close(){
  $("csModal").classList.remove("open");document.body.style.overflow="";
  if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
 }
+/* keep the popup + toast as direct children of <body> so no animated/transformed parent can trap position:fixed */
+document.body.appendChild($("csModal"));document.body.appendChild($("csToast"));
 $("csConnectBtn").onclick=function(){setTimeout(open,120)};
 $("csClose").onclick=close;
 $("csModal").addEventListener("click",function(e){if(e.target===this)close()});

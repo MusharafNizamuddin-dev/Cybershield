@@ -50,7 +50,7 @@ a.cs-home:active{transform:scale(.97);opacity:.85}
 
 /* 7. soft page entrance */
 @keyframes csPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.wrap,.container,body>nav,body>section.hero{animation:csPageIn .45s var(--cs-ease) both}
+.wrap,.container,body>nav,body>section.hero{animation:csPageIn .45s var(--cs-ease) backwards}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 
 /* 8. main action in a form: full width on phones so it lines up with the input above */
