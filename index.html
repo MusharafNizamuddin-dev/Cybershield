@@ -420,7 +420,16 @@ button:active{
 <div class="cs-modal" id="csModal" role="dialog" aria-modal="true" aria-labelledby="csTitle"><div class="cs-box">
 <div class="cs-head"><h3 id="csTitle">Connect your website</h3><button class="cs-x" id="csClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div class="cs-step" id="csStep1"><p>Enter your website address. We never visit it; you add a small guard to your server in the next step.</p><input id="csUrl" type="url" inputmode="url" placeholder="https://yoursite.com" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="cs-err" id="csErr"></div><div class="cs-row"><button class="cs-btn" id="csGo" type="button"><span class="cs-lbl">Connect</span></button></div></div>
-<div class="cs-step" id="csStep2" hidden><p>Add this to your site's server (Node/Express) and redeploy. This page updates automatically once your site checks in.</p><pre id="csSnip"></pre><p>Keep the key secret: set it as the environment variable <b>CYBERSHIELD_KEY</b>, never in public code.</p><div class="cs-row"><button class="cs-btn cs-ghost" id="csDisc" type="button"><span class="cs-lbl">Disconnect site</span></button></div></div>
+<div class="cs-step" id="csStep2" hidden>
+<p><b>Step 1.</b> Tap Copy. Your site details are already inside the code.</p>
+<div class="cs-row"><button class="cs-btn" id="csCopy" type="button"><span class="cs-lbl">Copy code</span></button></div>
+<pre id="csSnip" style="max-height:150px;overflow:auto">Preparing your code...</pre>
+<p><b>Step 2.</b> Open your website's main file. Put your cursor at the very start, before everything else. Paste. Then press Enter once so there is a blank line after it.</p>
+<details><summary style="cursor:pointer;font-weight:700">Which file is my main file?</summary><ol style="margin:8px 0 0 18px;line-height:1.6"><li>Open the file called <b>package.json</b> in your website's files.</li><li>Find the word <b>"start"</b>. Next to it you will see something like <b>node server.js</b>.</li><li>The name after <b>node</b> (here <b>server.js</b>) is your main file. If you don't see it, look for <b>"main"</b> in the same file.</li><li>On GitHub: open that file, tap the <b>pencil</b> icon, paste on the first line, then tap <b>Commit changes</b>.</li></ol></details>
+<p><b>Step 3.</b> Restart your website. Hosts like Render and Railway restart by themselves after you save the file on GitHub. Otherwise tap Restart or Deploy on your host. This page turns green when your site connects. Nothing is blocked until you switch rate limiting on.</p>
+<p>If your code is on a public page (like public GitHub), anyone could read the key inside this code. In that case set the key as a secret named <b>CYBERSHIELD_KEY</b> on your host instead.</p>
+<div class="cs-row"><button class="cs-btn cs-ghost" id="csDisc" type="button"><span class="cs-lbl">Disconnect site</span></button></div></div>
+</div>
 </div></div>
 <div class="grid"><!-- QR SHIELD --><div class="card" data-glow><div class="icon"><svg width="42"
 height="42"
@@ -998,9 +1007,39 @@ function err(t){$("csErr").textContent=t||""}
 var DEF="Connect your site to add rate limiting against abusive traffic.";
 function state(t,ok){var s=$("csState");s.textContent=t||DEF;s.className="cs-state"+(ok?" ok":"");$("csBar").classList.toggle("live",!!ok)}
 function lbl(el,t){el.querySelector(".cs-lbl").textContent=t}
-function snippet(){
- $("csSnip").textContent="curl -O "+API+"/cybershield-guard.js\n\n// in your Express app:\nconst guard = require('./cybershield-guard');\napp.set('trust proxy', 1);\napp.use(guard({\n  siteId: '"+site.id+"',\n  guardKey: process.env.CYBERSHIELD_KEY, // value: "+site.guardKey+"\n  api: '"+API+"'\n}));";
+var guardSrc="";
+function buildSnippet(){
+ var code="// ===== CyberShield guard: paste as the very first line of your main file =====\n"
+  +"(function(){\n"
+  +"const module = {};\n"+guardSrc.trim()+"\n"
+  +"const mw = module.exports({ siteId: '"+site.id+"', guardKey: process.env.CYBERSHIELD_KEY || '"+site.guardKey+"', api: '"+API+"' });\n"
+  +"const http = typeof require === 'function' ? require('http') : process.getBuiltinModule('http');\n"
+  +"const orig = http.Server.prototype.emit;\n"
+  +"http.Server.prototype.emit = function (ev, req, res) {\n"
+  +"  if (ev !== 'request') return orig.apply(this, arguments);\n"
+  +"  let ok = false;\n"
+  +"  const r = { on: (e, f) => res.on(e, f), get statusCode() { return res.statusCode; },\n"
+  +"    set(k, v) { res.setHeader(k, v); return r; }, status(c) { res.statusCode = c; return r; },\n"
+  +"    json(o) { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(o)); } };\n"
+  +"  try { mw(req, r, () => { ok = true; }); } catch (e) { ok = true; }\n"
+  +"  return ok ? orig.apply(this, arguments) : true;\n"
+  +"};\n"
+  +"})();\n"
+  +"// ===== end CyberShield guard =====\n";
+ $("csSnip").textContent=code;
 }
+function snippet(){
+ if(!site)return;
+ if(guardSrc){buildSnippet();return}
+ $("csSnip").textContent="Preparing your code...";
+ fetch(API+"/cybershield-guard.js").then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){guardSrc=t;if(site)buildSnippet()}).catch(function(){$("csSnip").textContent="Could not load the code. Check your internet and reopen this window."});
+}
+$("csCopy").onclick=function(){
+ var t=$("csSnip").textContent,b=$("csCopy");
+ function done(ok){lbl(b,ok?"Copied!":"Press and hold the code to copy");setTimeout(function(){lbl(b,"Copy code")},2200)}
+ function fb(){try{var x=document.createElement("textarea");x.value=t;x.style.position="fixed";x.style.opacity="0";document.body.appendChild(x);x.select();var ok=document.execCommand("copy");document.body.removeChild(x);done(ok)}catch(e){done(false)}}
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){done(true)},fb);else fb();
+};
 function render(){
  var c=$("csConnectBtn"),p=$("csProtectBtn"),l=$("csLimit");
  if(!site){c.className="cs-btn";lbl(c,"Connect Website");p.hidden=true;l.hidden=true;state("",false);return}
