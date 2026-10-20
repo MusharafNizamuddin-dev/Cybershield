@@ -407,6 +407,43 @@ button:active{
   .cs-box{border-radius:22px 22px 0 0;border-bottom:0;max-height:92%;transform:translateY(60px)}
 }
 @media(prefers-reduced-motion:reduce){.cs-box,.cs-modal,.cs-btn,.cs-step{transition:none!important;animation:none!important}}
+
+/* ---------- Cloudflare mode additions ---------- */
+.cs-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 14px;border-radius:14px;background:#020914;border:1px solid #1d334a}
+.cs-seg button{min-height:46px;padding:6px 8px;border:0;border-radius:11px;background:transparent;color:#9eacbf;font:inherit;font-size:14px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .25s ease,color .25s ease,transform .2s ease}
+.cs-seg button small{display:block;margin-top:1px;font-size:11px;font-weight:600;opacity:.75}
+.cs-seg button:active{transform:scale(.96)}
+.cs-seg button:focus-visible{outline:2px solid #00d9ff;outline-offset:2px}
+.cs-seg button[aria-pressed="true"]{background:rgba(0,217,255,.14);color:#00d9ff;box-shadow:inset 0 0 0 1px rgba(0,217,255,.4)}
+.cs-field{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .38s cubic-bezier(.2,.9,.25,1),opacity .3s ease}
+.cs-field.open{grid-template-rows:1fr;opacity:1}
+.cs-field>div{overflow:hidden;min-height:0}
+.cs-help{margin:0 0 12px;border:1px solid #1d334a;border-radius:12px;background:#0a1a2a}
+.cs-help summary{list-style:none;cursor:pointer;padding:12px 14px;font-size:13px;font-weight:800;color:#00d9ff;display:flex;align-items:center;justify-content:space-between}
+.cs-help summary::-webkit-details-marker{display:none}
+.cs-help summary::after{content:"+";font-size:18px;line-height:1;transition:transform .25s ease}
+.cs-help[open] summary::after{transform:rotate(45deg)}
+.cs-help ol{margin:0;padding:0 14px 12px 32px;font-size:13px;line-height:1.6;color:#9eacbf}
+.cs-help li{margin-bottom:4px}
+.cs-help b,.cs-info b{color:#f5f7fa}
+.cs-note{margin:10px 0 0!important;font-size:12px!important;line-height:1.5;color:#6f8196!important;text-align:center}
+.cs-gstat{display:flex;align-items:center;gap:10px;margin:2px 0 16px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,196,0,.4);background:#0a1a2a;color:#ffc400;font-size:14px;font-weight:700}
+.cs-gstat i{flex:none;width:9px;height:9px;border-radius:50%;background:#ffc400;animation:csPulse 1.6s ease-out infinite}
+.cs-gstat.ok{color:#00ff9d;border-color:rgba(0,255,157,.4)}
+.cs-gstat.ok i{background:#00ff9d;animation:none}
+.cs-info{margin:0 0 14px;padding:12px 14px;border-radius:12px;border:1px solid #1d334a;background:#0a1a2a;font-size:14px;line-height:1.6;color:#9eacbf}
+.cs-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 14px}
+.cs-stat{padding:12px 8px 11px;border-radius:14px;text-align:center;background:#020914;border:1px solid #1d334a}
+.cs-stat b{display:block;font-size:24px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums;color:#f5f7fa}
+.cs-stat span{display:block;margin-top:5px;font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#9eacbf}
+.cs-stat.ok{border-color:rgba(0,255,157,.35)}.cs-stat.ok b{color:#00ff9d}
+.cs-stat.bad{border-color:rgba(255,77,109,.38)}.cs-stat.bad b{color:#ff4d6d}
+.cs-stat.lim{border-color:rgba(0,217,255,.35)}.cs-stat.lim b{color:#00d9ff;font-size:19px;line-height:1.5}
+.cs-btn.cs-danger{background:#ff4d6d;color:#fff;box-shadow:0 6px 18px rgba(255,77,109,.2)}
+.cs-toast{position:fixed;left:50%;bottom:24px;z-index:10002;max-width:min(440px,calc(100% - 32px));padding:12px 18px;border-radius:14px;background:#12263a;border:1px solid #27425c;color:#f5f7fa;font-size:14px;line-height:1.5;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;visibility:hidden;transform:translate(-50%,12px);transition:opacity .3s ease,transform .3s ease,visibility 0s linear .3s}
+.cs-toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);transition-delay:0s}
+@keyframes csPulse{0%{box-shadow:0 0 0 0 rgba(255,196,0,.5)}100%{box-shadow:0 0 0 9px rgba(255,196,0,0)}}
+@media(prefers-reduced-motion:reduce){.cs-field,.cs-seg button,.cs-gstat i,.cs-toast{transition:none!important;animation:none!important}}
 </style>
 <div class="cs-bar" id="csBar">
   <span class="cs-ico"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="29" cy="30" r="17" stroke="#00d9ff" stroke-width="3"/><ellipse cx="29" cy="30" rx="7.5" ry="17" stroke="#00d9ff" stroke-width="3"/><path d="M12 30h34M15 20h28M15 40h28" stroke="#00d9ff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><path d="M47 33l10 4v8c0 6-4 10-10 12-6-2-10-6-10-12v-8l10-4z" fill="#031a12" stroke="#00ff9d" stroke-width="2.6" stroke-linejoin="round"/><path d="M42.5 45l3.2 3.2 5.3-6" stroke="#00ff9d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -419,8 +456,31 @@ button:active{
 </div>
 <div class="cs-modal" id="csModal" role="dialog" aria-modal="true" aria-labelledby="csTitle"><div class="cs-box">
 <div class="cs-head"><h3 id="csTitle">Connect your website</h3><button class="cs-x" id="csClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-<div class="cs-step" id="csStep1"><p>Enter your website address. We never visit it; you add a small guard to your server in the next step.</p><input id="csUrl" type="url" inputmode="url" placeholder="https://yoursite.com" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="cs-err" id="csErr"></div><div class="cs-row"><button class="cs-btn" id="csGo" type="button"><span class="cs-lbl">Connect</span></button></div></div>
+<div class="cs-step" id="csStep1">
+<div class="cs-seg" role="group" aria-label="How is your site hosted"><button type="button" id="csModeCf" aria-pressed="true">Any website<small>via Cloudflare</small></button><button type="button" id="csModeGuard" aria-pressed="false">Node / Express<small>install a guard</small></button></div>
+<p id="csModeText">Works with any site that uses Cloudflare (WordPress, PHP, Python, static sites and more). Nothing to install on your server.</p>
+<input id="csUrl" type="url" inputmode="url" enterkeyhint="next" placeholder="https://yoursite.com" autocomplete="off" autocapitalize="off" spellcheck="false">
+<div class="cs-field open" id="csTokenWrap"><div>
+<input id="csToken" type="password" enterkeyhint="go" placeholder="Cloudflare API token" autocomplete="off" autocapitalize="off" spellcheck="false">
+<details class="cs-help"><summary>How do I get a token?</summary><ol>
+<li>Open the Cloudflare dashboard, then <b>My Profile &gt; API Tokens</b>.</li>
+<li>Choose <b>Create Token &gt; Create Custom Token</b>.</li>
+<li>Add these permissions: <b>Zone &gt; Zone &gt; Read</b>, <b>Zone &gt; Zone WAF &gt; Edit</b>, and <b>Zone &gt; Analytics &gt; Read</b> (for the counters).</li>
+<li>Under Zone Resources pick <b>Include &gt; Specific zone</b> and choose your site.</li>
+<li>Create the token and paste it here.</li>
+</ol></details>
+</div></div>
+<div class="cs-err" id="csErr" role="alert"></div><div class="cs-row"><button class="cs-btn" id="csGo" type="button"><span class="cs-lbl">Connect</span></button></div>
+<p class="cs-note" id="csSecNote">Your token is stored encrypted and only used to add or remove one rate-limit rule. You can revoke it in Cloudflare at any time.</p></div>
 <div class="cs-step" id="csStep2" hidden>
+<div class="cs-gstat" id="csGStat"><i></i><span id="csGStatText">Waiting for your site to check in...</span></div>
+<div id="csGuideCf" hidden>
+<div class="cs-info" id="csCfInfo"></div>
+<div class="cs-stats" id="csStats" hidden><div class="cs-stat ok"><b id="csAllowed">0</b><span>Allowed</span></div><div class="cs-stat bad"><b id="csBlocked">0</b><span>Blocked</span></div><div class="cs-stat lim"><b id="csLimitVal">-</b><span>Limit</span></div></div>
+<p id="csCfScope"></p>
+<p class="cs-note" id="csStatNote" style="display:none"></p>
+</div>
+<div id="csGuideGuard">
 <p><b>Step 1.</b> Tap Copy. Your site details are already inside the code.</p>
 <div class="cs-row"><button class="cs-btn" id="csCopy" type="button"><span class="cs-lbl">Copy code</span></button></div>
 <pre id="csSnip" style="max-height:150px;overflow:auto">Preparing your code...</pre>
@@ -428,9 +488,11 @@ button:active{
 <details><summary style="cursor:pointer;font-weight:700">Which file is my main file?</summary><ol style="margin:8px 0 0 18px;line-height:1.6"><li>Open the file called <b>package.json</b> in your website's files.</li><li>Find the word <b>"start"</b>. Next to it you will see something like <b>node server.js</b>.</li><li>The name after <b>node</b> (here <b>server.js</b>) is your main file. If you don't see it, look for <b>"main"</b> in the same file.</li><li>On GitHub: open that file, tap the <b>pencil</b> icon, paste on the first line, then tap <b>Commit changes</b>.</li></ol></details>
 <p><b>Step 3.</b> Restart your website. Hosts like Render and Railway restart by themselves after you save the file on GitHub. Otherwise tap Restart or Deploy on your host. This page turns green when your site connects. Nothing is blocked until you switch rate limiting on.</p>
 <p>If your code is on a public page (like public GitHub), anyone could read the key inside this code. In that case set the key as a secret named <b>CYBERSHIELD_KEY</b> on your host instead.</p>
+</div>
 <div class="cs-row"><button class="cs-btn cs-ghost" id="csDisc" type="button"><span class="cs-lbl">Disconnect site</span></button></div></div>
 </div>
 </div></div>
+<div class="cs-toast" id="csToast" role="status" aria-live="polite"></div>
 <div class="grid"><!-- QR SHIELD --><div class="card" data-glow><div class="icon"><svg width="42"
 height="42"
 viewBox="0 0 64 64"
@@ -998,15 +1060,52 @@ el.style.setProperty(
 
 </script><script>
 (function(){
-var API="https://cybershield-api.musharafnizamuddin.workers.dev"; /* <- put your CyberShield API domain here */
+var API="https://cybershield-api.musharafnizamuddin.workers.dev";
+var KEY="cs_site";
 var $=function(i){return document.getElementById(i)};
-var site=null,last=null;
-try{site=JSON.parse(localStorage.getItem("cs_site")||"null")}catch(e){}
+var site=null,last=null,busy=false,mode="cf",discArm=0,toastT=0,lastFocus=null;
+try{site=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){}
+function save(){try{if(site)localStorage.setItem(KEY,JSON.stringify(site));else localStorage.removeItem(KEY)}catch(e){}}
 function hdr(){return {"Content-Type":"application/json","x-owner-key":site.ownerKey}}
 function err(t){$("csErr").textContent=t||""}
+function lbl(el,t){el.querySelector(".cs-lbl").textContent=t}
+var isCf=function(){return !!site&&site.mode==="cloudflare"};
+var ERR={
+  invalid_url:"Enter a valid http(s) address.",
+  invalid_token:"That doesn't look like a Cloudflare API token.",
+  zone_not_found:"This site isn't on the Cloudflare account that token belongs to.",
+  cloudflare_permission:"Cloudflare rejected the token. Check its permissions and that it covers this site.",
+  cloudflare_rule_limit:"Your Cloudflare plan's rate-limit rule quota is full. Remove an existing rule or upgrade.",
+  cloudflare_unreachable:"Could not reach Cloudflare. Try again in a moment.",
+  cloudflare_error:"Cloudflare returned an error. Try again.",
+  cloudflare_unavailable:"Cloudflare mode isn't enabled on the CyberShield server yet.",
+  rate_limited:"Too many attempts. Wait a minute and try again.",
+  busy:"The server is busy. Try again later."
+};
+function toast(t){
+  var el=$("csToast");el.textContent=t;el.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove("show")},4200);
+}
 var DEF="Connect your site to add rate limiting against abusive traffic.";
 function state(t,ok){var s=$("csState");s.textContent=t||DEF;s.className="cs-state"+(ok?" ok":"");$("csBar").classList.toggle("live",!!ok)}
-function lbl(el,t){el.querySelector(".cs-lbl").textContent=t}
+
+/* ---------- mode switch ---------- */
+function setMode(m){
+  mode=m;
+  $("csModeCf").setAttribute("aria-pressed",m==="cf"?"true":"false");
+  $("csModeGuard").setAttribute("aria-pressed",m==="guard"?"true":"false");
+  $("csTokenWrap").classList.toggle("open",m==="cf");
+  $("csSecNote").style.display=m==="cf"?"":"none";
+  $("csModeText").textContent=m==="cf"
+    ?"Works with any site that uses Cloudflare (WordPress, PHP, Python, static sites and more). Nothing to install on your server."
+    :"For Node.js / Express sites. We never visit your site; you add a small guard to your server in the next step.";
+  $("csUrl").setAttribute("enterkeyhint",m==="cf"?"next":"go");
+  err("");
+}
+$("csModeCf").onclick=function(){setMode("cf")};
+$("csModeGuard").onclick=function(){setMode("guard")};
+
+/* ---------- guard snippet (Node / Express mode) ---------- */
 var guardSrc="";
 function buildSnippet(){
  var code="// ===== CyberShield guard: paste as the very first line of your main file =====\n"
@@ -1029,10 +1128,10 @@ function buildSnippet(){
  $("csSnip").textContent=code;
 }
 function snippet(){
- if(!site)return;
+ if(!site||isCf())return;
  if(guardSrc){buildSnippet();return}
  $("csSnip").textContent="Preparing your code...";
- fetch(API+"/cybershield-guard.js").then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){guardSrc=t;if(site)buildSnippet()}).catch(function(){$("csSnip").textContent="Could not load the code. Check your internet and reopen this window."});
+ fetch(API+"/cybershield-guard.js").then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){guardSrc=t;if(site&&!isCf())buildSnippet()}).catch(function(){$("csSnip").textContent="Could not load the code. Check your internet and reopen this window."});
 }
 $("csCopy").onclick=function(){
  var t=$("csSnip").textContent,b=$("csCopy");
@@ -1040,46 +1139,96 @@ $("csCopy").onclick=function(){
  function fb(){try{var x=document.createElement("textarea");x.value=t;x.style.position="fixed";x.style.opacity="0";document.body.appendChild(x);x.select();var ok=document.execCommand("copy");document.body.removeChild(x);done(ok)}catch(e){done(false)}}
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){done(true)},fb);else fb();
 };
+
+/* ---------- render ---------- */
+function tween(el,to){
+  var from=+el.getAttribute("data-v")||0;el.setAttribute("data-v",to);
+  if(from===to){el.textContent=to.toLocaleString();return}
+  var t0=performance.now(),dur=650;
+  (function f(t){var k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=Math.round(from+(to-from)*e).toLocaleString();if(k<1)requestAnimationFrame(f)})(t0);
+}
+function renderGuide(on){
+  var cfm=isCf();
+  $("csGuideCf").hidden=!cfm;
+  $("csGuideGuard").style.display=cfm?"none":"";
+  $("csGStat").className="cs-gstat"+(on?" ok":"");
+  $("csGStatText").textContent=cfm
+    ?(on?"Connected to Cloudflare"+(site.zone?" ("+site.zone+")":"")+".":"Connecting to Cloudflare...")
+    :(on?"Your site has checked in. You're connected.":"Waiting for your site to check in...");
+  $("csTitle").textContent=!site?"Connect your website":(cfm?"Cloudflare protection":"Install the guard");
+  if(!cfm)return;
+  var pl=site.plan||"free",en=last&&last.enforced,info=$("csCfInfo");
+  info.textContent="";
+  var b=document.createElement("b");b.textContent=(site.zone||site.host)+" ("+pl+" plan)";
+  info.appendChild(b);
+  info.appendChild(document.createTextNode(en
+    ?". Enforced as "+en.requests+" requests per "+en.period+" seconds per visitor, then blocked for "+en.timeout+" seconds."
+    :". Turn on rate limiting to add the rule to your Cloudflare zone."));
+  $("csCfScope").textContent=pl==="free"
+    ?"On Cloudflare's Free plan the rule applies to every hostname in your zone and counts over 10 seconds, so your limit is converted to a 10-second rate. Free plans also allow only one rate-limit rule."
+    :"The rule applies to "+site.host+" and its www or apex twin.";
+  var prot=!!(on&&last&&last.protect);
+  $("csStats").hidden=!prot;
+  var nt=$("csStatNote");
+  if(prot){
+    var hasStats=last.allowed!=null&&last.blocked!=null;
+    if(hasStats){tween($("csAllowed"),+last.allowed||0);tween($("csBlocked"),+last.blocked||0)}
+    else{$("csAllowed").textContent="-";$("csBlocked").textContent="-";$("csAllowed").setAttribute("data-v","0");$("csBlocked").setAttribute("data-v","0")}
+    $("csLimitVal").textContent=en?(en.requests+" / "+en.period+"s"):(last.max+" / "+(last.windowSec===60?"min":last.windowSec+"s"));
+    nt.style.display="";
+    nt.textContent=hasStats?"Last 24 hours, from Cloudflare analytics.":"Counters need the Analytics: Read permission on your token. Add it in Cloudflare to see them.";
+  }else nt.style.display="none";
+}
 function render(){
- var c=$("csConnectBtn"),p=$("csProtectBtn"),l=$("csLimit");
- if(!site){c.className="cs-btn";lbl(c,"Connect Website");p.hidden=true;l.hidden=true;state("",false);return}
- var on=!!(last&&last.connected);
- c.className="cs-btn"+(on?"":" cs-ghost");
- lbl(c,(on?"Connected: ":"Pending: ")+site.host);
- if(!on){p.hidden=true;l.hidden=true;state("Waiting for "+site.host+" to check in (install the guard, then redeploy)...",false);return}
- p.hidden=false;l.hidden=false;
- if(document.activeElement!==l&&[].some.call(l.options,function(o){return +o.value===last.max}))l.value=String(last.max);
- if(last.protect){lbl(p,"Rate limiting ON. Turn off");state("Protected: "+last.max+" requests per "+last.windowSec+"s per IP. Allowed "+last.allowed+", blocked "+last.blocked,true)}
- else{lbl(p,"Add security / rate limiting");state("Site connected. Rate limiting is off.",true)}
+  var c=$("csConnectBtn"),p=$("csProtectBtn"),l=$("csLimit");
+  if(!site){c.className="cs-btn";lbl(c,"Connect Website");p.hidden=true;l.hidden=true;state("",false);renderGuide(false);return}
+  var on=!!(last&&last.connected),cfm=isCf();
+  c.className="cs-btn"+(on?"":" cs-ghost");
+  lbl(c,(on?"Connected: ":"Pending: ")+site.host);
+  renderGuide(on);
+  if(!on){
+    p.hidden=true;l.hidden=true;
+    state(cfm?"Connecting "+site.host+" to Cloudflare...":"Waiting for "+site.host+" to check in (install the guard, then redeploy)...",false);
+    return;
+  }
+  p.hidden=false;l.hidden=false;
+  if(document.activeElement!==l&&[].some.call(l.options,function(o){return +o.value===last.max}))l.value=String(last.max);
+  if(last.protect){
+    lbl(p,"Rate limiting ON. Turn off");
+    var en=last.enforced;
+    state("Protected: "+(cfm&&en?en.requests+" requests per "+en.period+"s per visitor":last.max+" requests per "+last.windowSec+"s per IP")
+      +(last.allowed!=null&&last.blocked!=null?". Allowed "+last.allowed+", blocked "+last.blocked:""),true);
+  }else{lbl(p,"Add security / rate limiting");state("Site connected"+(cfm?" through Cloudflare":"")+". Rate limiting is off.",true)}
 }
 async function refresh(){
- if(!site)return;
- try{
-  var r=await fetch(API+"/api/sites/"+site.id+"/status",{headers:hdr()});
-  if(r.status===404||r.status===403){localStorage.removeItem("cs_site");site=null;last=null;render();return}
-  last=await r.json();render();
- }catch(e){state("Cannot reach the CyberShield API",false)}
+  if(!site||document.hidden)return;
+  try{
+    var r=await fetch(API+"/api/sites/"+site.id+"/status",{headers:hdr()});
+    if(r.status===404||r.status===403){site=null;last=null;save();render();steps();return}
+    last=await r.json();render();
+  }catch(e){state("Cannot reach the CyberShield API",false)}
 }
 function steps(){
- var s1=$("csStep1"),s2=$("csStep2");
- s1.hidden=!!site;s2.hidden=!site;
- if(site)snippet();
+  var s1=$("csStep1"),s2=$("csStep2");
+  s1.hidden=!!site;s2.hidden=!site;
+  discArm=0;lbl($("csDisc"),"Disconnect site");$("csDisc").classList.remove("cs-danger");$("csDisc").classList.add("cs-ghost");
+  if(site){snippet();renderGuide(!!(last&&last.connected))}else $("csTitle").textContent="Connect your website";
 }
-var lastFocus=null;
-/* Keyboard handling: lift the modal above the on-screen keyboard */
+
+/* ---------- modal ---------- */
 function fitKb(){
  var vv=window.visualViewport;if(!vv)return;
  var kb=Math.max(0,Math.round(window.innerHeight-vv.height-vv.offsetTop));
- if(kb<80)kb=0; /* ignore browser-bar jitter */
+ if(kb<80)kb=0;
  document.documentElement.style.setProperty("--cs-kb",kb+"px");
- if(kb&&document.activeElement===$("csUrl"))$("csUrl").scrollIntoView({block:"nearest"});
+ var a=document.activeElement;
+ if(kb&&a&&(a===$("csUrl")||a===$("csToken")))a.scrollIntoView({block:"nearest"});
 }
-if(window.visualViewport){
- visualViewport.addEventListener("resize",fitKb);
- visualViewport.addEventListener("scroll",fitKb);
-}
-$("csUrl").addEventListener("focus",function(){setTimeout(fitKb,50);setTimeout(fitKb,350)});
-$("csUrl").addEventListener("blur",function(){setTimeout(fitKb,100)});
+if(window.visualViewport){visualViewport.addEventListener("resize",fitKb);visualViewport.addEventListener("scroll",fitKb)}
+["csUrl","csToken"].forEach(function(id){
+  $(id).addEventListener("focus",function(){setTimeout(fitKb,50);setTimeout(fitKb,350)});
+  $(id).addEventListener("blur",function(){setTimeout(fitKb,100)});
+});
 function open(){
  err("");steps();lastFocus=document.activeElement;
  $("csModal").classList.add("open");document.body.style.overflow="hidden";
@@ -1094,41 +1243,76 @@ $("csConnectBtn").onclick=function(){setTimeout(open,120)};
 $("csClose").onclick=close;
 $("csModal").addEventListener("click",function(e){if(e.target===this)close()});
 document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("csModal").classList.contains("open"))close()});
-$("csUrl").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("csGo").click()}});
-/* tactile press ripple on every cs button */
+$("csUrl").addEventListener("keydown",function(e){if(e.key!=="Enter")return;e.preventDefault();if(mode==="cf")$("csToken").focus();else $("csGo").click()});
+$("csToken").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("csGo").click()}});
 document.addEventListener("pointerdown",function(e){
  var b=e.target.closest&&e.target.closest(".cs-btn");if(!b||b.disabled)return;
  var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,sp=document.createElement("span");
  sp.className="cs-ripple";sp.style.cssText="width:"+d+"px;height:"+d+"px;left:"+(e.clientX-r.left-d/2)+"px;top:"+(e.clientY-r.top-d/2)+"px";
  b.appendChild(sp);setTimeout(function(){sp.remove()},650);
 });
+
+/* ---------- connect / disconnect / protect ---------- */
 $("csGo").onclick=async function(){
- err("");var b=this;b.classList.add("busy");
+ if(busy)return;
+ var b=this,cfm=mode==="cf",url=$("csUrl").value.trim(),token=$("csToken").value.trim();
+ err("");
+ if(!url){err("Enter your website address.");return}
+ if(cfm&&!token){err("Paste your Cloudflare API token.");return}
+ if(!/^https?:\/\//i.test(url))url="https://"+url;
+ busy=true;b.classList.add("busy");lbl(b,"Connecting...");
  try{
-  var r=await fetch(API+"/api/sites/connect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:$("csUrl").value.trim()})});
-  var d=await r.json();
-  if(!r.ok){err(d.error==="invalid_url"?"Enter a valid http(s) address.":"Could not connect. Try again.");return}
-  site={id:d.siteId,ownerKey:d.ownerKey,guardKey:d.guardKey,host:d.host};last=null;
-  localStorage.setItem("cs_site",JSON.stringify(site));
+  var r=await fetch(API+(cfm?"/api/sites/connect-cloudflare":"/api/sites/connect"),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(cfm?{url:url,token:token}:{url:url})});
+  var d={};try{d=await r.json()}catch(e){}
+  if(!r.ok){err(ERR[d.error]||(r.status===429?ERR.rate_limited:"Could not connect. Try again."));return}
+  site={id:d.siteId,ownerKey:d.ownerKey,guardKey:d.guardKey||"",host:d.host,mode:cfm?"cloudflare":"guard",plan:d.plan||"",zone:d.zone||""};
+  last=null;save();
+  $("csUrl").value="";$("csToken").value="";
   render();steps();
- }catch(e){err("Cannot reach the CyberShield API.")}
- finally{b.classList.remove("busy")}
+  if(cfm)toast("Connected to Cloudflare. Turn on rate limiting to protect your site.");
+  refresh();
+ }catch(e){err("Cannot reach the CyberShield API. Check your internet connection.")}
+ finally{busy=false;b.classList.remove("busy");lbl(b,"Connect")}
 };
-$("csDisc").onclick=function(){localStorage.removeItem("cs_site");site=null;last=null;render();steps();$("csUrl").value="";setTimeout(function(){$("csUrl").focus({preventScroll:true})},200)};
+$("csDisc").onclick=async function(){
+ var b=this;if(!site)return;
+ var cfm=isCf();
+ if(!discArm){
+  discArm=1;b.classList.remove("cs-ghost");b.classList.add("cs-danger");
+  lbl(b,cfm?"Tap again: remove rule and token":"Tap again to confirm");
+  setTimeout(function(){if(discArm===1){discArm=0;b.classList.remove("cs-danger");b.classList.add("cs-ghost");lbl(b,"Disconnect site")}},4000);
+  return;
+ }
+ discArm=0;
+ var gone=site,removed=null;
+ try{
+  var r=await fetch(API+"/api/sites/"+gone.id,{method:"DELETE",headers:{"Content-Type":"application/json","x-owner-key":gone.ownerKey}});
+  if(r.ok){var d=await r.json();removed=d.ruleRemoved}
+ }catch(e){removed=false}
+ site=null;last=null;save();render();steps();
+ $("csUrl").value="";
+ toast(cfm&&removed===false?"Disconnected. Remove the CyberShield rule in your Cloudflare dashboard (Security > WAF > Rate limiting rules).":"Website disconnected.");
+ setTimeout(function(){$("csUrl").focus({preventScroll:true})},200);
+};
 async function send(en){
- await fetch(API+"/api/sites/"+site.id+"/protect",{method:"POST",headers:hdr(),body:JSON.stringify({enabled:en,max:+$("csLimit").value,windowSec:60})});
+ var r=await fetch(API+"/api/sites/"+site.id+"/protect",{method:"POST",headers:hdr(),body:JSON.stringify({enabled:en,max:+$("csLimit").value,windowSec:60})});
+ if(!r.ok){var d={};try{d=await r.json()}catch(e){}toast(ERR[d.error]||"Could not update protection. Try again.")}
  await refresh();
 }
 $("csProtectBtn").onclick=async function(){
  if(!site||!last)return;
+ var b=this;b.classList.add("busy");
  try{await send(!last.protect)}catch(e){state("Could not update protection",false)}
+ b.classList.remove("busy");
 };
 $("csLimit").onchange=async function(){
  if(site&&last&&last.protect){try{await send(true)}catch(e){state("Could not update the limit",false)}}
 };
-render();refresh();setInterval(refresh,5000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden)refresh()});
+render();steps();refresh();setInterval(refresh,5000);
 })();
 </script>
+
 <script>
 /* CyberShield live-network background - same animation as the Android app (cs-fx.js) */
 (function(){
