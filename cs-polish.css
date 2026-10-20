@@ -1,0 +1,57 @@
+/* CyberShield shared UI polish: consistent buttons + smooth touch feedback on every page */
+:root{--cs-ease:cubic-bezier(.2,.8,.2,1)}
+html{-webkit-tap-highlight-color:transparent}
+a,button,label,input,select,summary,[role=button]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+[hidden]{display:none!important}
+
+/* 1. every clickable control: same smooth transition + press feedback */
+button,.btn,.manual-btn,.demo-btn,.analyze-btn,.run-btn,.send-btn,.primary,.secondary,.sample-btn,
+.select-btn,.scan-button,.choose-file,.file-label,.back,.back-link,.manual-close,.modal-close,.cs-x{
+  transition:transform .18s var(--cs-ease),box-shadow .22s ease,filter .2s ease,background-color .2s ease,
+             border-color .2s ease,color .2s ease,opacity .2s ease!important;
+  -webkit-user-select:none;user-select:none;cursor:pointer}
+button:active,.btn:active,.manual-btn:active,.demo-btn:active,.analyze-btn:active,.run-btn:active,.send-btn:active,
+.primary:active,.secondary:active,.sample-btn:active,.select-btn:active,.scan-button:active,.choose-file:active,
+.file-label:active,.back:active,.back-link:active,.manual-close:active,.modal-close:active,.cs-x:active{
+  transform:scale(.96)!important;filter:brightness(.94)}
+button:disabled,.btn[disabled],button[aria-busy=true]{opacity:.55;cursor:not-allowed;transform:none!important}
+
+/* 2. text buttons: icon + label centred, comfortable touch height (zero specificity: page CSS can still override) */
+:where(.btn,.manual-btn,.demo-btn,.analyze-btn,.run-btn,.send-btn,.primary,.secondary,.sample-btn,.select-btn,
+.scan-button,.choose-file,.file-label){
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;
+  line-height:1.2;text-align:center;font-family:inherit}
+:where(.back,.back-link){display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;line-height:1.2;text-decoration:none}
+:where(.manual-close,.modal-close,.cs-x){display:inline-flex;align-items:center;justify-content:center}
+
+/* 3. gentle hover lift (mouse only, so it never sticks on phones) */
+@media(hover:hover){
+  .btn:hover,.manual-btn:hover,.demo-btn:hover,.analyze-btn:hover,.run-btn:hover,.send-btn:hover,.primary:hover,
+  .secondary:hover,.sample-btn:hover,.select-btn:hover,.scan-button:hover,.choose-file:hover,.file-label:hover,
+  .back:hover,.back-link:hover{transform:translateY(-1px)}
+  .btn:active:hover,.primary:active:hover,.analyze-btn:active:hover,.run-btn:active:hover{transform:scale(.96)!important}
+}
+
+/* 4. inputs, links, focus */
+input,select,textarea{transition:border-color .2s ease,box-shadow .2s ease,background-color .2s ease}
+input:focus,select:focus,textarea:focus{outline:0;border-color:#00d9ff;box-shadow:0 0 0 3px rgba(0,217,255,.16)}
+a{transition:color .2s ease,opacity .2s ease,border-color .2s ease}
+button:focus-visible,.btn:focus-visible,a:focus-visible,label:focus-visible{outline:2px solid #00d9ff;outline-offset:2px}
+
+/* 5. logo links back to the dashboard on tool pages */
+a.cs-home{text-decoration:none;display:inline-block;transition:opacity .2s ease,transform .18s var(--cs-ease)}
+a.cs-home:not(.logo){color:inherit}
+a.cs-home:active{transform:scale(.97);opacity:.85}
+
+/* 6. cards respond to touch */
+.card{transition:border-color .2s ease,box-shadow .2s ease,transform .2s var(--cs-ease)}
+.card:active{transform:scale(.985)}
+@media(hover:hover){.card:hover{border-color:#2a4d6e;box-shadow:0 10px 30px rgba(0,0,0,.35);transform:translateY(-3px)}}
+
+/* 7. soft page entrance */
+@keyframes csPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.wrap,.container,body>nav,body>section.hero{animation:csPageIn .45s var(--cs-ease) both}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* 8. main action in a form: full width on phones so it lines up with the input above */
+@media(max-width:520px){#checkBtn{width:100%}}
