@@ -1,0 +1,1272 @@
+<!doctype html>
+
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberShield</title><style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    background:#020914;
+    color:#f5f7fa;
+    font-family:Segoe UI,Arial,sans-serif
+}
+
+.wrap{
+    position:relative;
+    z-index:1;
+    max-width:1050px;
+    margin:auto;
+    padding:0 20px 60px
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:22px 0;
+    border-bottom:1px solid #17283a
+}
+
+.logo{
+    font-size:27px;
+    font-weight:800
+}
+
+.logo span{
+    color:#00ff9d
+}
+
+.small{
+    color:#7f8da0;
+    font-size:13px
+}
+
+.hero{
+    text-align:center;
+    padding:55px 10px 35px
+}
+
+.badge{
+    display:inline-block;
+    border:1px solid #00ff9d;
+    color:#00ff9d;
+    border-radius:30px;
+    padding:9px 17px;
+    font-weight:700;
+    font-size:13px
+}
+
+h1{
+    font-size:50px;
+    line-height:1.1;
+    margin:22px 0 15px
+}
+
+h1 span{
+    color:#00d9ff
+}
+
+p{
+    color:#9eacbf;
+    line-height:1.7
+}
+
+.tool-section{
+    margin-top:35px
+}
+
+.tool-heading{
+    font-size:18px;
+    font-weight:900;
+    letter-spacing:.8px;
+    margin:0 0 14px
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px
+}
+
+.card{
+    background:#071321;
+    border:1px solid #193047;
+    border-radius:20px;
+    padding:27px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease
+}
+
+.icon{
+    font-size:42px
+}
+
+.card h2{
+    font-size:18px;
+    margin:14px 0 8px
+}
+
+.card p{
+    font-size:13px;
+    flex-grow:1
+}
+
+.btn{
+    display:inline-block;
+    margin-top:16px;
+    padding:13px 20px;
+    border-radius:10px;
+    background:#00ff9d;
+    color:#00130b;
+    font-weight:800;
+    border:0;
+    text-decoration:none;
+    cursor:pointer
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #294158;
+    background:#020914;
+    color:white;
+    margin-top:14px
+}
+
+.manual-card .btn{
+    width:100%
+}
+
+footer{
+    text-align:center;
+    color:#5f6d80;
+    font-size:12px;
+    padding:40px 0 10px
+}
+
+@media(max-width:800px){
+    .grid{
+        grid-template-columns:repeat(2,1fr)
+    }
+}
+
+@media(max-width:520px){
+    .grid{
+        grid-template-columns:1fr
+    }
+
+    h1{
+        font-size:36px
+    }
+}
+
+/* ================= BOOT SPLASH (same as the Android app) ================= */
+.cyber-boot{
+  --green:#00ff9d;--cyan:#00d9ff;--cs-bg:#020914;--cs-bg-rgb:2,9,20;--cs-text:#eaf3fa;--cs-dim:#6a727b;
+  --cs-accent-rgb:0,255,157;--cs-accent-2:#00d9ff;--cs-accent-2-rgb:0,217,255;--cs-accent-2-bg:#022635;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+  position:fixed;inset:0;z-index:30000;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;color:var(--cs-text);background:var(--cs-bg);
+  animation:bootOut .5s ease 3.5s forwards;
+}
+.cyber-boot.hidden{display:none}
+.boot-grid{
+  position:absolute;inset:-30%;
+  background-image:linear-gradient(rgba(var(--cs-accent-2-rgb),.08) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--cs-accent-2-rgb),.08) 1px,transparent 1px);
+  background-size:46px 46px;
+  transform:perspective(500px) rotateX(62deg) translateY(-10%);
+  animation:gridMove 5s linear infinite;
+}
+.boot-vignette{position:absolute;inset:0;background:radial-gradient(circle at center,transparent 15%,rgba(var(--cs-bg-rgb),.25) 45%,var(--cs-bg) 100%)}
+.boot-top,.boot-bottom{
+  position:absolute;left:28px;right:28px;
+  display:flex;justify-content:space-between;
+  font:700 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:var(--cs-dim);
+}
+.boot-top{top:calc(24px + var(--safe-top))}
+.boot-bottom{bottom:calc(24px + var(--safe-bottom));justify-content:center;color:var(--green);letter-spacing:4px}
+.boot-center{position:relative;z-index:2;width:min(420px,78vw);text-align:center}
+.boot-shield{
+  position:relative;width:170px;height:198px;margin:auto;
+  filter:drop-shadow(0 0 18px rgba(var(--cs-accent-rgb),.32));
+  animation:shieldBuild .8s ease .1s both;
+}
+.boot-shield svg{width:100%;height:100%}
+.shield-outline,.shield-inner{
+  fill:rgba(var(--cs-accent-rgb),.035);stroke:var(--green);stroke-width:3;
+  stroke-dasharray:520;stroke-dashoffset:520;
+  animation:drawLine 1s cubic-bezier(.2,.8,.2,1) .15s forwards;
+}
+.shield-inner{stroke:var(--cyan);stroke-width:1.5;stroke-dasharray:430;stroke-dashoffset:430;animation-delay:.5s}
+.shield-check{
+  fill:none;stroke:var(--green);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:100;stroke-dashoffset:100;
+  animation:drawLine .45s ease 1.1s forwards;
+}
+.boot-title{
+  margin-top:-4px;font-size:30px;font-weight:900;letter-spacing:7px;
+  opacity:0;transform:translateY(8px);animation:titleIn .5s ease 1.3s forwards;
+}
+.boot-title span{color:var(--green)}
+.boot-status{
+  min-height:14px;margin-top:12px;
+  font:700 11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;color:var(--cs-accent-2);
+  opacity:0;animation:fadeIn .4s 1.45s forwards;
+}
+.boot-progress{width:240px;height:2px;margin:18px auto 0;overflow:hidden;background:var(--cs-accent-2-bg);opacity:0;animation:fadeIn .4s 1.5s forwards}
+.boot-progress i{display:block;width:0;height:100%;background:var(--green);box-shadow:0 0 12px var(--green);animation:progress 1.7s linear 1.55s forwards}
+.boot-events{position:absolute;left:28px;bottom:calc(60px + var(--safe-bottom));width:260px;font:11px/1.8 ui-monospace,Menlo,Consolas,monospace;color:var(--cs-dim)}
+.boot-events div{opacity:0;animation:fadeIn .3s forwards}
+.boot-particles{position:absolute;inset:-70px;pointer-events:none}
+.boot-particles i{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:particleIn 1.4s ease forwards}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+@keyframes shieldBuild{from{transform:scale(.72);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes titleIn{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes progress{to{width:100%}}
+@keyframes particleIn{0%{transform:translate(var(--x),var(--y)) scale(1);opacity:0}35%{opacity:1}100%{transform:translate(0,0) scale(.2);opacity:0}}
+@keyframes gridMove{to{transform:perspective(500px) rotateX(62deg) translateY(5%)}}
+@keyframes bootOut{to{opacity:0;visibility:hidden;pointer-events:none}}
+@media(max-width:520px){
+  .boot-top,.boot-bottom{left:15px;right:15px}
+  .boot-events{left:15px}
+  .boot-title{font-size:24px;letter-spacing:5px}
+}
+@media(prefers-reduced-motion:reduce){.cyber-boot{display:none!important}}
+
+  /* Remove the default mobile blue tap highlight */
+*{
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* Remove the browser's default focus outline */
+a,
+button,
+input,
+select,
+textarea{
+    outline:none;
+}
+
+/* Keep a subtle CyberShield focus effect instead */
+a:focus-visible,
+button:focus-visible{
+    outline:2px solid rgba(0,255,157,.45);
+    outline-offset:3px;
+}
+
+/* Remove the flash while an element is being pressed */
+a:active,
+button:active{
+    -webkit-tap-highlight-color:transparent;
+}
+</style></head><body><div id="cyberBoot" class="cyber-boot" aria-hidden="true">
+  <div class="boot-grid"></div>
+  <div class="boot-vignette"></div>
+  <div class="boot-top"><span>CYBERSHIELD // SECURITY CORE</span><span>CLICK TO SKIP</span></div>
+  <div class="boot-center">
+    <div class="boot-particles" id="bootParticles"></div>
+    <div class="boot-shield">
+      <svg viewBox="0 0 180 210" aria-hidden="true">
+        <path class="shield-outline" d="M90 10 L158 35 V91 C158 142 130 180 90 200 C50 180 22 142 22 91 V35 Z"/>
+        <path class="shield-inner" d="M90 27 L143 47 V91 C143 129 121 157 90 175 C59 157 37 129 37 91 V47 Z"/>
+        <path class="shield-check" d="M58 103 L79 124 L124 77"/>
+      </svg>
+    </div>
+    <div class="boot-title">CYBER<span>SHIELD</span></div>
+    <div class="boot-status" id="bootStatus">INITIALIZING SECURITY CORE</div>
+    <div class="boot-progress"><i></i></div>
+  </div>
+  <div class="boot-events" id="bootEvents"></div>
+  <div class="boot-bottom">LEARN. ANALYZE. STAY SECURE.</div>
+</div>
+<script>
+(function(){
+  var KEY='cybershieldBooted';
+  var el=document.getElementById('cyberBoot');
+  if(!el)return;
+  function hide(){el.classList.add('hidden');}
+  function seen(){try{return sessionStorage.getItem(KEY)==='1';}catch(e){return false;}}
+  if(seen()){hide();return;}
+  try{sessionStorage.setItem(KEY,'1');}catch(e){}
+  el.addEventListener('click',hide);
+  var ps=document.getElementById('bootParticles');
+  var events=document.getElementById('bootEvents');
+  var status=document.getElementById('bootStatus');
+  for(var i=0;i<30;i++){
+    var d=document.createElement('i'),a=Math.random()*Math.PI*2,r=160+Math.random()*230;
+    d.style.setProperty('--x',Math.cos(a)*r+'px');
+    d.style.setProperty('--y',Math.sin(a)*r+'px');
+    d.style.left=(50+Math.random()*8-4)+'%';
+    d.style.top=(50+Math.random()*8-4)+'%';
+    d.style.animationDelay=(.1+Math.random()*1.3)+'s';
+    ps.appendChild(d);
+  }
+  ['SECURITY CORE ........ ONLINE','THREAT ENGINE ........ READY','ANALYSIS MODULE ...... READY','DEFENSE LAYER ........ ACTIVE']
+    .forEach(function(m,i){
+      var d=document.createElement('div');
+      d.textContent='> '+m;
+      d.style.animationDelay=(1.6+i*.3)+'s';
+      events.appendChild(d);
+    });
+  ['INITIALIZING SECURITY CORE','LOADING DEFENSE MODULES','VERIFYING SECURITY LAYERS','ALL SYSTEMS OPERATIONAL']
+    .forEach(function(m,i){setTimeout(function(){if(status)status.textContent=m;},400+i*850);});
+  setTimeout(hide,4100);
+  window.addEventListener('pageshow',function(e){if(e.persisted)hide();});
+})();
+</script><div class="wrap"><div class="top">
+    <div class="logo">
+        🛡️ Cyber<span>Shield</span>
+    </div></div><section class="hero"><div class="badge">
+    BROWSER SECURITY TOOLKIT
+</div><h1>
+    Stay Safe <span>Online</span>
+</h1><p>
+    The web edition of CyberShield brings the core protection tools
+    from our Android app to any browser — scan QR codes,
+    analyze logs, and detect fraud in seconds.
+</p><div class="ps-dl"><a class="btn ps-apk" id="psApk" href="CyberShield.apk" download><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00130b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>Get the Android app</a><div class="ps-note" id="psNote"></div></div></section><div class="tool-section"><h2 class="tool-heading">
+    Security Tools
+</h2><style>
+/* ---------- Website Protection panel ---------- */
+.cs-bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 30px;padding:18px 20px;border-radius:18px;
+  border:1px solid rgba(0,217,255,.28);
+  background:linear-gradient(135deg,rgba(0,217,255,.10),rgba(0,217,255,0) 60%),rgba(7,19,33,.78);
+  box-shadow:0 12px 30px rgba(0,0,0,.35);transition:border-color .35s ease,box-shadow .35s ease}
+.cs-bar.live{border-color:rgba(0,255,157,.45);box-shadow:0 12px 30px rgba(0,0,0,.35),0 0 30px rgba(0,255,157,.08)}
+.cs-ico{flex:none;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#0a1a2a;border:1px solid rgba(0,217,255,.35)}
+.cs-ico svg{width:30px;height:30px}
+.cs-txt{flex:1 1 220px;min-width:0}
+.cs-txt strong{display:block;font-size:17px;font-weight:700;color:#f5f7fa}
+.cs-state{display:block;margin-top:3px;font-size:14px;line-height:1.5;color:#9eacbf;transition:color .3s}
+.cs-state.ok{color:#00ff9d}
+.cs-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto}
+.cs-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:0 22px;border:0;border-radius:12px;
+  background:#00ff9d;color:#021;font:inherit;font-size:15px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 6px 18px rgba(0,255,157,.18);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease,background-color .25s ease,color .25s ease,border-color .25s ease,opacity .2s ease}
+.cs-btn svg{width:18px;height:18px;flex:none}
+.cs-btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(0,255,157,.28)}
+.cs-btn:active{transform:scale(.95);box-shadow:0 2px 8px rgba(0,255,157,.15)}
+.cs-btn:focus-visible,.cs-sel:focus-visible,.cs-x:focus-visible{outline:2px solid #00d9ff;outline-offset:2px}
+.cs-btn.cs-ghost{background:rgba(23,40,58,.9);color:#dce7f2;border:1px solid #27425c;box-shadow:none}
+.cs-btn.cs-ghost:hover{background:#1d334a;box-shadow:none}
+.cs-btn.cs-on{background:#00d4ff;box-shadow:0 6px 18px rgba(0,212,255,.2)}
+.cs-btn.cs-on:hover{box-shadow:0 10px 24px rgba(0,212,255,.3)}
+.cs-btn.busy{pointer-events:none;opacity:.85}
+.cs-btn.busy::after{content:"";width:16px;height:16px;border-radius:50%;border:2px solid rgba(0,17,11,.25);border-top-color:#021;animation:csSpin .7s linear infinite}
+.cs-btn[hidden],.cs-sel[hidden]{display:none}
+.cs-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:csRip .6s ease-out forwards;pointer-events:none}
+.cs-sel{min-height:46px;background:#0a1a2a;color:#dce7f2;border:1px solid #27425c;border-radius:12px;padding:0 14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:border-color .2s}
+.cs-sel:hover{border-color:#00d9ff}
+@keyframes csSpin{to{transform:rotate(360deg)}}
+@keyframes csRip{to{transform:scale(1);opacity:0}}
+@keyframes csIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- Modal (fades + slides, never pops) ---------- */
+.cs-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:rgba(2,9,20,0);opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .3s ease,background .3s ease,visibility 0s linear .3s}
+.cs-modal.open{background:rgba(2,9,20,.82);opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+.cs-box{width:100%;max-width:560px;max-height:90vh;overflow:auto;background:#0b1522;border:1px solid #1d334a;border-radius:20px;padding:24px;color:#f5f7fa;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);transform:scale(.94) translateY(14px);opacity:0;
+  transition:transform .42s cubic-bezier(.2,.9,.25,1),opacity .3s ease}
+.cs-modal.open .cs-box{transform:none;opacity:1}
+.cs-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.cs-head h3{flex:1;margin:0;font-size:20px;font-weight:800;color:#00ff9d}
+.cs-x{flex:none;width:38px;height:38px;padding:0;border-radius:12px;border:1px solid #1d334a;background:#0a1a2a;color:#9eacbf;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),background .2s,color .2s}
+.cs-x:hover{background:#12263a;color:#fff}.cs-x:active{transform:scale(.9)}
+.cs-x svg{width:18px;height:18px}
+.cs-box p{color:#9eacbf;font-size:14px;line-height:1.6;margin:0 0 14px}
+.cs-box input{width:100%;box-sizing:border-box;min-height:48px;padding:0 14px;border-radius:12px;border:1px solid #1d334a;background:#020914;color:#fff;margin:2px 0 6px;font:inherit;font-size:15px;
+  transition:border-color .2s,box-shadow .2s}
+.cs-box input:focus{outline:0;border-color:#00d9ff;box-shadow:0 0 0 3px rgba(0,217,255,.15)}
+.cs-box pre{background:#020914;border:1px solid #1d334a;border-radius:12px;padding:12px;font-size:12px;line-height:1.55;color:#cfe0ed;overflow-x:auto;white-space:pre-wrap;word-break:break-all;margin:0 0 14px}
+.cs-step{animation:csIn .4s cubic-bezier(.2,.9,.25,1) both}
+.cs-step[hidden]{display:none}
+.cs-err{color:#ff4d6d;font-size:13px;min-height:20px;margin:2px 0 6px}
+.cs-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.cs-row .cs-btn{flex:1 1 140px}
+@media(max-width:620px){
+  .cs-bar{padding:16px}
+  .cs-act{width:100%;margin-left:0}
+  .cs-act .cs-btn,.cs-act .cs-sel{flex:1 1 100%}
+  .cs-modal{align-items:flex-end;padding:0}
+  .cs-box{border-radius:22px 22px 0 0;border-bottom:0;max-height:92vh;transform:translateY(60px)}
+}
+@media(prefers-reduced-motion:reduce){.cs-box,.cs-modal,.cs-btn,.cs-step{transition:none!important;animation:none!important}}
+</style>
+<div class="cs-bar" id="csBar">
+  <span class="cs-ico"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="29" cy="30" r="17" stroke="#00d9ff" stroke-width="3"/><ellipse cx="29" cy="30" rx="7.5" ry="17" stroke="#00d9ff" stroke-width="3"/><path d="M12 30h34M15 20h28M15 40h28" stroke="#00d9ff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><path d="M47 33l10 4v8c0 6-4 10-10 12-6-2-10-6-10-12v-8l10-4z" fill="#031a12" stroke="#00ff9d" stroke-width="2.6" stroke-linejoin="round"/><path d="M42.5 45l3.2 3.2 5.3-6" stroke="#00ff9d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <div class="cs-txt"><strong>Website Protection</strong><span class="cs-state" id="csState"></span></div>
+  <div class="cs-act">
+    <select class="cs-sel" id="csLimit" aria-label="Requests per minute" hidden><option value="30">30 / min</option><option value="60" selected>60 / min</option><option value="120">120 / min</option><option value="300">300 / min</option></select>
+    <button class="cs-btn cs-on" id="csProtectBtn" type="button" hidden><span class="cs-lbl">Add security / rate limiting</span></button>
+    <button class="cs-btn" id="csConnectBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg><span class="cs-lbl">Connect Website</span></button>
+  </div>
+</div>
+<div class="cs-modal" id="csModal" role="dialog" aria-modal="true" aria-labelledby="csTitle"><div class="cs-box">
+<div class="cs-head"><h3 id="csTitle">Connect your website</h3><button class="cs-x" id="csClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="cs-step" id="csStep1"><p>Enter your website address. We never visit it; you add a small guard to your server in the next step.</p><input id="csUrl" type="url" inputmode="url" placeholder="https://yoursite.com" autocomplete="off" autocapitalize="off" spellcheck="false"><div class="cs-err" id="csErr"></div><div class="cs-row"><button class="cs-btn" id="csGo" type="button"><span class="cs-lbl">Connect</span></button></div></div>
+<div class="cs-step" id="csStep2" hidden><p>Add this to your site's server (Node/Express) and redeploy. This page updates automatically once your site checks in.</p><pre id="csSnip"></pre><p>Keep the key secret: set it as the environment variable <b>CYBERSHIELD_KEY</b>, never in public code.</p><div class="cs-row"><button class="cs-btn cs-ghost" id="csDisc" type="button"><span class="cs-lbl">Disconnect site</span></button></div></div>
+</div></div>
+<div class="grid"><!-- QR SHIELD --><div class="card" data-glow><div class="icon"><svg width="42"
+height="42"
+viewBox="0 0 64 64"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<rect x="9"
+y="9"
+width="16"
+height="16"
+rx="2"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<rect x="14"
+y="14"
+width="6"
+height="6"
+fill="#00ff9d"/>
+
+<rect x="39"
+y="9"
+width="16"
+height="16"
+rx="2"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<rect x="44"
+y="14"
+width="6"
+height="6"
+fill="#00ff9d"/>
+
+<rect x="9"
+y="39"
+width="16"
+height="16"
+rx="2"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<rect x="14"
+y="44"
+width="6"
+height="6"
+fill="#00ff9d"/>
+
+<rect x="39"
+y="39"
+width="6"
+height="6"
+fill="#00ff9d"/>
+
+<rect x="49"
+y="39"
+width="6"
+height="6"
+fill="#00d9ff"/>
+
+<rect x="39"
+y="49"
+width="6"
+height="6"
+fill="#00d9ff"/>
+
+<rect x="49"
+y="49"
+width="6"
+height="6"
+fill="#00ff9d"/>
+
+<path d="M32 27L38 30V35C38 40 35 43 32 45C29 43 26 40 26 35V30L32 27Z"
+stroke="#00ff9d"
+stroke-width="2.5"
+stroke-linejoin="round"/>
+
+<path d="M29 35L31 37L35 32"
+stroke="#00ff9d"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg></div><h2>QR Shield</h2><p>
+Upload a QR code image and see its destination before you ever open it.
+</p><a class="btn"
+href="qr-shield.html">
+
+Open QR Shield
+
+</a></div><!-- LOG ANALYZER --><div class="card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M6 3.5h7.5L18 8v3.2" stroke="#00d9ff" stroke-width="1.7"/><path d="M6 3.5v17h5.2" stroke="#00d9ff" stroke-width="1.7"/><path d="M13.5 3.5V8H18" stroke="#00d9ff" stroke-width="1.7"/><path d="M9 10h4M9 13.4h2.4M9 16.8h1.6" stroke="#8fb4cc" stroke-width="1.6"/><circle cx="16.2" cy="16.2" r="3.6" stroke="#00ff9d" stroke-width="2"/><path d="m18.9 18.9 2.4 2.4" stroke="#00ff9d" stroke-width="2"/></svg>
+</div><h2>Log Analyzer</h2><p>
+Analyze security logs and spot suspicious activity patterns at a glance.
+</p><a class="btn" href="log-analyzer.html">
+Open Log Analyzer
+</a></div><!-- DATA BREACH CHECKER --><div class="card" data-glow><div class="icon"><svg width="42"
+height="42"
+viewBox="0 0 64 64"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<circle cx="27"
+cy="27"
+r="16"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<path d="M38 38L52 52"
+stroke="#00d9ff"
+stroke-width="3.5"
+stroke-linecap="round"/>
+
+<path d="M20 27L25 32L35 20"
+stroke="#00ff9d"
+stroke-width="3"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg></div><h2>Data Breach Checker</h2><p>
+Check if your email has been exposed in a live database of known data breaches.
+</p><a class="btn" href="breach-checker.html">
+Open Breach Checker
+</a></div><!-- FRAUDGUARD --><div class="card" data-glow><div class="icon"><svg width="42"
+height="42"
+viewBox="0 0 64 64"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<rect x="8"
+y="15"
+width="48"
+height="34"
+rx="6"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<path d="M8 25H56"
+stroke="#00d9ff"
+stroke-width="3"/>
+
+<path d="M17 37H29"
+stroke="#00ff9d"
+stroke-width="3"
+stroke-linecap="round"/>
+
+<path d="M17 43H25"
+stroke="#00d9ff"
+stroke-width="3"
+stroke-linecap="round"/>
+
+<path d="M43 34L48 37V42C48 47 45 50 41 52C37 50 34 47 34 42V37L41 33L43 34Z"
+stroke="#00ff9d"
+stroke-width="2.5"
+stroke-linejoin="round"/>
+
+<path d="M38 42L40 44L44 39"
+stroke="#00ff9d"
+stroke-width="2.5"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg></div><h2>FraudGuard</h2><p>
+Detect payment-fraud patterns like card testing, velocity bursts and impossible travel, and score transaction risk.
+</p><a class="btn" href="fraudguard.html">
+Open FraudGuard
+</a></div><!-- RATGUARD --><div class="card" data-glow><div class="icon"><svg width="42"
+height="42"
+viewBox="0 0 64 64"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path d="M32 6L52 14V29C52 42 44 52 32 58C20 52 12 42 12 29V14L32 6Z"
+stroke="#00d9ff"
+stroke-width="3"
+stroke-linejoin="round"/>
+
+<rect x="20"
+y="24"
+width="24"
+height="17"
+rx="3"
+stroke="#00ff9d"
+stroke-width="2.5"/>
+
+<path d="M24 47H40"
+stroke="#00d9ff"
+stroke-width="3"
+stroke-linecap="round"/>
+
+<path d="M26 29L30 33L38 27"
+stroke="#00ff9d"
+stroke-width="2.5"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg></div><h2>RATGuard</h2><p>
+Analyze Android APK files for suspicious permissions,
+components, and malware-risk indicators before installation.
+</p><a class="btn" href="rat-guard.html">
+Open RATGuard
+</a></div> 
+</div>
+</div><style>
+.ps-dl{margin-top:22px}
+.ps-apk{display:inline-flex;align-items:center;gap:10px;margin-top:0;padding:15px 28px;font-size:16px}
+.ps-note{color:#ffb86b;font-size:13px;min-height:18px;margin-top:10px}
+.ps-intro{color:#9eacbf;font-size:14px;margin:0 0 18px;max-width:640px}
+.ps-card .ps-shots{display:flex;gap:10px;justify-content:center;margin-top:16px;width:100%}
+.ps-shot{position:relative;flex:1;max-width:150px;aspect-ratio:9/19;border:1px solid #1d334a;border-radius:16px;background:#020914;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.ps-shots:not(.two) .ps-shot{max-width:220px}
+.ps-shot:has(img){aspect-ratio:auto;display:block}
+.ps-shot img{display:block;width:100%;height:auto}
+.ps-shot span{position:relative;z-index:1;color:#5f6d80;font-size:11px;padding:0 6px 14px;text-align:center}
+.ps-shot img+span{display:none}
+.ps-card .ps-cap{font-size:12px;color:#7f8da0;margin:12px 0 0;flex-grow:0}
+</style><div class="tool-section" id="phone-tools"><h2 class="tool-heading">Phone Tools</h2><p class="ps-intro">These tools need real phone access, so they only run in the Android app. Here they are on a real phone.</p><div class="grid">
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="10" width="36" height="44" rx="6" stroke="#00d9ff" stroke-width="3"/><path d="M32 22l9 4v8c0 6-4 10-9 12-5-2-9-6-9-12v-8z" stroke="#00ff9d" stroke-width="3" stroke-linejoin="round"/></svg></div><h2>Tap Shield</h2><p>Detects tapjacking, when a hidden screen tricks you into tapping something dangerous.</p><div class="ps-shots"><div class="ps-shot"><img src="tap-shield.png" alt="Tap Shield screenshot" loading="lazy" onerror="this.remove()"><span>Screenshot coming soon</span></div></div></div>
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="24" r="9" stroke="#00d9ff" stroke-width="3"/><path d="M14 52c2-11 10-16 18-16s16 5 18 16" stroke="#00ff9d" stroke-width="3" stroke-linecap="round"/></svg></div><h2>Guardian Alert</h2><p>Sends a warning to a trusted family member when the phone shows risky activity.</p><div class="ps-shots"><div class="ps-shot"><img src="guardian-alert.png" alt="Guardian Alert screenshot" loading="lazy" onerror="this.remove()"><span>Screenshot coming soon</span></div></div></div>
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="#00d9ff" stroke-width="3"/><path d="M12 32h40M32 12c8 6 8 34 0 40M32 12c-8 6-8 34 0 40" stroke="#00ff9d" stroke-width="2.5"/></svg></div><h2>DNS Firewall</h2><p>Blocks ads, trackers, malware and phishing websites for the whole phone.</p><div class="ps-shots"><div class="ps-shot"><img src="dns-firewall.png" alt="DNS Firewall screenshot" loading="lazy" onerror="this.remove()"><span>Screenshot coming soon</span></div></div></div>
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 22h32l-3 28H19z" stroke="#00d9ff" stroke-width="3" stroke-linejoin="round"/><path d="M20 22c0-6 5-10 12-10s12 4 12 10" stroke="#00ff9d" stroke-width="3"/></svg></div><h2>Honeypot Vault</h2><p>Plants decoy files in Downloads. Any app that touches them is flagged as scanning malware.</p><div class="ps-shots"><div class="ps-shot"><img src="honeypot.png" alt="Honeypot screenshot" loading="lazy" onerror="this.remove()"><span>Screenshot coming soon</span></div></div></div>
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="14" stroke="#00d9ff" stroke-width="3"/><path d="M38 38l14 14" stroke="#00ff9d" stroke-width="3.5" stroke-linecap="round"/></svg></div><h2>Phone Scan</h2><p>A quick security scan of the phone that checks installed apps and settings.</p><div class="ps-shots"><div class="ps-shot"><img src="phone-scan.png" alt="Phone Scan screenshot" loading="lazy" onerror="this.remove()"><span>Screenshot coming soon</span></div></div></div>
+<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36 8L20 34h11l-3 22 16-26H33z" stroke="#00ff9d" stroke-width="3" stroke-linejoin="round"/></svg></div><h2>Charger Guard</h2><p>Tells you if a USB port is power only or connected to a computer, and alerts you when your phone plugs into one.</p><div class="ps-shots two"><div class="ps-shot"><img src="charger-guard-green.png" alt="Charger Guard safe screen" loading="lazy" onerror="this.remove()"><span>Safe</span></div><div class="ps-shot"><img src="charger-guard-red.png" alt="Charger Guard danger screen" loading="lazy" onerror="this.remove()"><span>Danger</span></div></div><p class="ps-cap">Both screens use the app's built-in simulate mode.</p></div>
+</div></div><script>
+(function(){
+var a=document.getElementById("psApk"),n=document.getElementById("psNote");
+if(a&&a.getAttribute("href")==="YOUR_APK_LINK_HERE"){
+a.addEventListener("click",function(e){e.preventDefault();n.textContent="The APK link is not added yet.";});
+}})();
+</script><footer>CyberShield Web Edition — Learn. Analyze. Stay Secure.
+
+<br><br>
+
+© 2026 CyberShield
+
+</footer></div><!-- ================= CYBERSHIELD SVG UI ================= --><style id="cybershield-svg-ui">
+
+.card:hover{
+
+border-color:rgba(0,217,255,.72) !important;
+
+box-shadow:
+0 0 0 1px rgba(0,217,255,.18),
+0 0 28px rgba(0,217,255,.16),
+0 18px 45px rgba(0,0,0,.28) !important;
+
+transform:translateY(-3px);
+
+}
+
+.card:active{
+
+transform:translateY(-1px);
+
+}
+
+.cs-svg-icon{
+
+width:1.15em;
+height:1.15em;
+display:inline-block;
+vertical-align:-.18em;
+flex:0 0 auto;
+
+}
+
+.cs-svg-icon svg{
+
+width:100%;
+height:100%;
+display:block;
+
+}
+  /* Remove the default mobile blue tap highlight */
+*{
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* Remove the browser's default focus outline */
+a,
+button,
+input,
+select,
+textarea{
+    outline:none;
+}
+
+/* Keep a subtle CyberShield focus effect instead */
+a:focus-visible,
+button:focus-visible{
+    outline:2px solid rgba(0,255,157,.45);
+    outline-offset:3px;
+}
+
+/* Remove the flash while an element is being pressed */
+a:active,
+button:active{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+</style><!-- ================= EMOJI → SVG REPLACEMENT ================= --><script>
+
+(function(){
+
+const ICONS={
+
+"🛡":"shield",
+"⚠":"warning",
+"🔗":"link",
+"🚨":"alert",
+"✓":"check",
+"🔎":"search",
+"🔒":"lock",
+"🔐":"lock",
+"🚫":"blocked",
+"🧩":"puzzle",
+"♻":"recycle",
+"📁":"folder",
+"📄":"file",
+"📊":"chart",
+"📖":"book",
+"🔍":"search",
+"✕":"x",
+"✔":"check",
+"❌":"x",
+"🟡":"dot"
+
+};
+
+function svgFor(name){
+
+const common=
+'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+
+const paths={
+
+shield:
+'<path '+common+' d="M12 3l7 3v5c0 4.7-2.8 7.8-7 10-4.2-2.2-7-5.3-7-10V6l7-3z"/><path '+common+' d="M9 12l2 2 4-4"/>',
+
+warning:
+'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+
+link:
+'<path '+common+' d="M10 13.5l4-4"/><path '+common+' d="M8.5 16H7a4 4 0 010-8h3"/><path '+common+' d="M15.5 8H17a4 4 0 010 8h-3"/>',
+
+alert:
+'<path '+common+' d="M12 3l9 17H3L12 3z"/><path '+common+' d="M12 8v5"/><path stroke="currentColor" stroke-width="2.5" d="M12 16.5h.01"/>',
+
+check:
+'<path '+common+' d="M5 12l4 4L19 6"/>',
+
+search:
+'<circle '+common+' cx="10.5" cy="10.5" r="6.5"/><path '+common+' d="M16 16l5 5"/>',
+
+lock:
+'<rect '+common+' x="5" y="10" width="14" height="10" rx="2"/><path '+common+' d="M8 10V7a4 4 0 018 0v3"/>',
+
+blocked:
+'<circle '+common+' cx="12" cy="12" r="8"/><path '+common+' d="M7 7l10 10"/>',
+
+puzzle:
+'<path '+common+' d="M9 5h3a2 2 0 114 0v1h3v5a2 2 0 110 4v4h-5a2 2 0 110-4H9v-3a2 2 0 110-4V5z"/>',
+
+recycle:
+'<path '+common+' d="M8 7l2-3 3 1"/><path '+common+' d="M10 4l2 4H8"/><path '+common+' d="M17 9l3 2-1 3"/><path '+common+' d="M20 11l-5 1 2-4"/><path '+common+' d="M8 17l-1 3-3-1"/><path '+common+' d="M7 20l3-4 2 4"/>',
+
+folder:
+'<path '+common+' d="M3 7h7l2 2h9v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>',
+
+file:
+'<path '+common+' d="M6 3h8l4 4v14H6z"/><path '+common+' d="M14 3v5h5"/>',
+
+chart:
+'<path '+common+' d="M5 19V9M12 19V5M19 19v-7"/><path '+common+' d="M3 21h18"/>',
+
+book:
+'<path '+common+' d="M5 4h10a4 4 0 014 4v12H9a4 4 0 01-4-4V4z"/><path '+common+' d="M9 20V8a4 4 0 014-4"/>',
+
+x:
+'<path '+common+' d="M6 6l12 12M18 6L6 18"/>',
+
+dot:
+'<circle cx="12" cy="12" r="5" fill="currentColor"/>'
+
+};
+
+return '<span class="cs-svg-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'+
+(paths[name]||paths.shield)+
+'</svg></span>';
+
+}
+
+function replaceTextNode(node){
+
+if(
+!node.nodeValue ||
+!/[🛡⚠🔗🚨✓🔎🔒🔐🚫🧩♻📁📄📊📖🔍✕✔❌🟡]/u.test(node.nodeValue)
+)return;
+
+const parent=node.parentNode;
+
+if(
+!parent ||
+/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/i.test(parent.nodeName)
+)return;
+
+const text=node.nodeValue;
+
+const frag=document.createDocumentFragment();
+
+let last=0;
+
+const re=/🛡|⚠|🔗|🚨|✓|🔎|🔒|🔐|🚫|🧩|♻|📁|📄|📊|📖|🔍|✕|✔|❌|🟡/gu;
+
+let m;
+
+while((m=re.exec(text))){
+
+if(m.index>last){
+
+frag.appendChild(
+document.createTextNode(
+text.slice(last,m.index)
+)
+);
+
+}
+
+const holder=document.createElement("span");
+
+holder.innerHTML=svgFor(ICONS[m[0]]);
+
+frag.appendChild(holder.firstElementChild);
+
+last=re.lastIndex;
+
+}
+
+if(last<text.length){
+
+frag.appendChild(
+document.createTextNode(
+text.slice(last)
+)
+);
+
+}
+
+parent.replaceChild(frag,node);
+
+}
+
+function scan(root){
+
+const walker=document.createTreeWalker(
+root,
+NodeFilter.SHOW_TEXT,
+{
+acceptNode:function(n){
+
+const p=n.parentNode;
+
+return p &&
+!/^(SCRIPT|STYLE)$/i.test(p.nodeName)
+?
+NodeFilter.FILTER_ACCEPT
+:
+NodeFilter.FILTER_REJECT;
+
+}
+}
+);
+
+const nodes=[];
+
+let n;
+
+while((n=walker.nextNode()))
+nodes.push(n);
+
+nodes.forEach(replaceTextNode);
+
+}
+
+function init(){
+
+scan(document.body);
+
+const observer=
+new MutationObserver(function(records){
+
+records.forEach(function(record){
+
+record.addedNodes.forEach(function(node){
+
+if(node.nodeType===Node.TEXT_NODE){
+
+replaceTextNode(node);
+
+}
+
+else if(node.nodeType===Node.ELEMENT_NODE){
+
+scan(node);
+
+}
+
+});
+
+});
+
+});
+
+observer.observe(
+document.body,
+{
+childList:true,
+subtree:true
+}
+);
+
+}
+
+if(document.readyState==="loading"){
+
+document.addEventListener(
+"DOMContentLoaded",
+init
+);
+
+}else{
+
+init();
+
+}
+
+})();
+
+</script><!-- ================= CARD POINTER GLOW ================= --><script>
+
+document
+.querySelectorAll("[data-glow]")
+.forEach(function(el){
+
+el.addEventListener(
+"pointermove",
+function(e){
+
+const r=
+el.getBoundingClientRect();
+
+el.style.setProperty(
+"--gx",
+(e.clientX-r.left)+"px"
+);
+
+el.style.setProperty(
+"--gy",
+(e.clientY-r.top)+"px"
+);
+
+}
+);
+
+});
+
+</script><script>
+(function(){
+var API="https://cybershield-api.musharafnizamuddin.workers.dev"; /* <- put your CyberShield API domain here */
+var $=function(i){return document.getElementById(i)};
+var site=null,last=null;
+try{site=JSON.parse(localStorage.getItem("cs_site")||"null")}catch(e){}
+function hdr(){return {"Content-Type":"application/json","x-owner-key":site.ownerKey}}
+function err(t){$("csErr").textContent=t||""}
+var DEF="Connect your site to add rate limiting against abusive traffic.";
+function state(t,ok){var s=$("csState");s.textContent=t||DEF;s.className="cs-state"+(ok?" ok":"");$("csBar").classList.toggle("live",!!ok)}
+function lbl(el,t){el.querySelector(".cs-lbl").textContent=t}
+function snippet(){
+ $("csSnip").textContent="curl -O "+API+"/cybershield-guard.js\n\n// in your Express app:\nconst guard = require('./cybershield-guard');\napp.set('trust proxy', 1);\napp.use(guard({\n  siteId: '"+site.id+"',\n  guardKey: process.env.CYBERSHIELD_KEY, // value: "+site.guardKey+"\n  api: '"+API+"'\n}));";
+}
+function render(){
+ var c=$("csConnectBtn"),p=$("csProtectBtn"),l=$("csLimit");
+ if(!site){c.className="cs-btn";lbl(c,"Connect Website");p.hidden=true;l.hidden=true;state("",false);return}
+ var on=!!(last&&last.connected);
+ c.className="cs-btn"+(on?"":" cs-ghost");
+ lbl(c,(on?"Connected: ":"Pending: ")+site.host);
+ if(!on){p.hidden=true;l.hidden=true;state("Waiting for "+site.host+" to check in (install the guard, then redeploy)...",false);return}
+ p.hidden=false;l.hidden=false;
+ if(document.activeElement!==l&&[].some.call(l.options,function(o){return +o.value===last.max}))l.value=String(last.max);
+ if(last.protect){lbl(p,"Rate limiting ON. Turn off");state("Protected: "+last.max+" requests per "+last.windowSec+"s per IP. Allowed "+last.allowed+", blocked "+last.blocked,true)}
+ else{lbl(p,"Add security / rate limiting");state("Site connected. Rate limiting is off.",true)}
+}
+async function refresh(){
+ if(!site)return;
+ try{
+  var r=await fetch(API+"/api/sites/"+site.id+"/status",{headers:hdr()});
+  if(r.status===404||r.status===403){localStorage.removeItem("cs_site");site=null;last=null;render();return}
+  last=await r.json();render();
+ }catch(e){state("Cannot reach the CyberShield API",false)}
+}
+function steps(){
+ var s1=$("csStep1"),s2=$("csStep2");
+ s1.hidden=!!site;s2.hidden=!site;
+ if(site)snippet();
+}
+var lastFocus=null;
+function open(){
+ err("");steps();lastFocus=document.activeElement;
+ $("csModal").classList.add("open");document.body.style.overflow="hidden";
+ if(!site)setTimeout(function(){$("csUrl").focus({preventScroll:true})},320);
+}
+function close(){
+ $("csModal").classList.remove("open");document.body.style.overflow="";
+ if(lastFocus&&lastFocus.focus)lastFocus.focus({preventScroll:true});
+}
+$("csConnectBtn").onclick=function(){setTimeout(open,120)};
+$("csClose").onclick=close;
+$("csModal").addEventListener("click",function(e){if(e.target===this)close()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("csModal").classList.contains("open"))close()});
+$("csUrl").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("csGo").click()}});
+/* tactile press ripple on every cs button */
+document.addEventListener("pointerdown",function(e){
+ var b=e.target.closest&&e.target.closest(".cs-btn");if(!b||b.disabled)return;
+ var r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,sp=document.createElement("span");
+ sp.className="cs-ripple";sp.style.cssText="width:"+d+"px;height:"+d+"px;left:"+(e.clientX-r.left-d/2)+"px;top:"+(e.clientY-r.top-d/2)+"px";
+ b.appendChild(sp);setTimeout(function(){sp.remove()},650);
+});
+$("csGo").onclick=async function(){
+ err("");var b=this;b.classList.add("busy");
+ try{
+  var r=await fetch(API+"/api/sites/connect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:$("csUrl").value.trim()})});
+  var d=await r.json();
+  if(!r.ok){err(d.error==="invalid_url"?"Enter a valid http(s) address.":"Could not connect. Try again.");return}
+  site={id:d.siteId,ownerKey:d.ownerKey,guardKey:d.guardKey,host:d.host};last=null;
+  localStorage.setItem("cs_site",JSON.stringify(site));
+  render();steps();
+ }catch(e){err("Cannot reach the CyberShield API.")}
+ finally{b.classList.remove("busy")}
+};
+$("csDisc").onclick=function(){localStorage.removeItem("cs_site");site=null;last=null;render();steps();$("csUrl").value="";setTimeout(function(){$("csUrl").focus({preventScroll:true})},200)};
+async function send(en){
+ await fetch(API+"/api/sites/"+site.id+"/protect",{method:"POST",headers:hdr(),body:JSON.stringify({enabled:en,max:+$("csLimit").value,windowSec:60})});
+ await refresh();
+}
+$("csProtectBtn").onclick=async function(){
+ if(!site||!last)return;
+ try{await send(!last.protect)}catch(e){state("Could not update protection",false)}
+};
+$("csLimit").onchange=async function(){
+ if(site&&last&&last.protect){try{await send(true)}catch(e){state("Could not update the limit",false)}}
+};
+render();refresh();setInterval(refresh,5000);
+})();
+</script>
+<script>
+/* CyberShield live-network background - same animation as the Android app (cs-fx.js) */
+(function(){
+  'use strict';
+  var root=document.documentElement,reduce=false;
+  try{reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
+  var bgControl = { pause: function () {}, resume: function () {} };
+
+  function initBackground() {
+    // Make the page background see-through so the canvas (behind everything) shows.
+    var htmlBg = getComputedStyle(root).backgroundColor;
+    if (!htmlBg || htmlBg === 'rgba(0, 0, 0, 0)' || htmlBg === 'transparent') {
+      root.style.backgroundColor = getComputedStyle(document.body).backgroundColor || '#020914';
+    }
+    // The soft colour glows live on the canvas layer: a "fixed" body background repaints on every scroll frame.
+    var st = document.createElement('style');
+    st.textContent =
+      'body{background-color:transparent!important;background-image:none!important;background-attachment:scroll!important}' +
+      '#cs-fx-bg{position:fixed;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block;max-width:none;transform:translateZ(0);' +
+      'background:radial-gradient(820px 400px at 50% -140px,rgba(var(--cs-accent-2-rgb,0,217,255),.09),transparent 70%),' +
+      'radial-gradient(500px 300px at 100% 30%,rgba(var(--cs-accent-rgb,0,255,157),.05),transparent 70%)}';
+    document.head.appendChild(st);
+
+    var cv = document.createElement('canvas');
+    cv.id = 'cs-fx-bg';
+    cv.setAttribute('aria-hidden', 'true');
+    root.appendChild(cv);
+    var ctx = cv.getContext('2d');
+    if (!ctx) return;
+
+    var cA = '0,217,255', cB = '0,255,157', light = false;
+    function cssRgb(name, fb) {
+      var v = getComputedStyle(root).getPropertyValue(name).trim();
+      return /^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/.test(v) ? v : fb;
+    }
+    function readColors() {
+      cA = cssRgb('--cs-accent-2-rgb', '0,217,255');
+      cB = cssRgb('--cs-accent-rgb', '0,255,157');
+      light = root.getAttribute('data-cs-scheme') === 'light';
+    }
+    readColors();
+    setInterval(readColors, 3000); // picks up theme / palette changes
+
+    var W = 0, H = 0, link = 120, nodes = [], packets = [], raf = 0, last = 0, nextPacket = 0;
+    var gap = 33, level = 0, emaCost = 0, frames = 0, stopped = false, scrolling = false, scrollTimer = 0, paused = false;
+    var lb = [[], [], [], []], LA = [0.10, 0.20, 0.30, 0.42];
+    var targetNodes = 0;
+
+    function mk() {
+      var a = Math.random() * 6.2832, s = 5 + Math.random() * 12;
+      return { x: Math.random() * W, y: Math.random() * H, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+               r: 1 + Math.random() * 1.4, g: Math.random() < 0.28 };
+    }
+    function resize() {
+      // 1x canvas on purpose: this is soft ambient art, and it is 4x cheaper than full phone resolution.
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = W; cv.height = H;
+      targetNodes = Math.max(30, Math.min(64, Math.round(W * H / 12000)));
+      var n = Math.round(targetNodes * (level === 0 ? 1 : level === 1 ? 0.7 : 0.5));
+      while (nodes.length < n) nodes.push(mk());
+      nodes.length = n;
+      link = Math.max(95, Math.min(150, W * 0.32));
+      if (reduce || stopped) draw(0, 0);
+    }
+
+    function draw(dt, t) {
+      var k = light ? 0.55 : 1, i, j, b, n, m, dx, dy, d, q, arr;
+      ctx.clearRect(0, 0, W, H);
+
+      // slow scan band
+      var by = ((t / 1000) % 11) / 11 * (H + 240) - 120;
+      var g = ctx.createLinearGradient(0, by - 120, 0, by + 120);
+      g.addColorStop(0, 'rgba(' + cA + ',0)');
+      g.addColorStop(0.5, 'rgba(' + cA + ',' + (0.06 * k).toFixed(3) + ')');
+      g.addColorStop(1, 'rgba(' + cA + ',0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, by - 120, W, 240);
+
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        n.x += n.vx * dt; n.y += n.vy * dt;
+        if (n.x < -20) n.x = W + 20; else if (n.x > W + 20) n.x = -20;
+        if (n.y < -20) n.y = H + 20; else if (n.y > H + 20) n.y = -20;
+      }
+
+      // links: sorted into 4 strength buckets so the whole frame needs only 4 stroke calls
+      for (b = 0; b < 4; b++) lb[b].length = 0;
+      var l2 = link * link;
+      for (i = 0; i < nodes.length; i++) {
+        n = nodes[i];
+        for (j = i + 1; j < nodes.length; j++) {
+          m = nodes[j]; dx = n.x - m.x; dy = n.y - m.y;
+          d = dx * dx + dy * dy;
+          if (d < l2) {
+            q = 1 - Math.sqrt(d) / link;
+            arr = lb[q > 0.75 ? 3 : q > 0.5 ? 2 : q > 0.25 ? 1 : 0];
+            arr.push(n.x, n.y, m.x, m.y);
+          }
+        }
+      }
+      ctx.lineWidth = 1;
+      for (b = 0; b < 4; b++) {
+        arr = lb[b];
+        if (!arr.length) continue;
+        ctx.strokeStyle = 'rgba(' + cA + ',' + (LA[b] * k).toFixed(3) + ')';
+        ctx.beginPath();
+        for (i = 0; i < arr.length; i += 4) { ctx.moveTo(arr[i], arr[i + 1]); ctx.lineTo(arr[i + 2], arr[i + 3]); }
+        ctx.stroke();
+      }
+
+      // nodes: one path per colour
+      var pass, col;
+      for (pass = 0; pass < 2; pass++) {
+        col = pass ? cB : cA;
+        if (pass) {
+          ctx.fillStyle = 'rgba(' + col + ',' + (0.10 * k).toFixed(3) + ')';
+          ctx.beginPath();
+          for (i = 0; i < nodes.length; i++) if (nodes[i].g) { ctx.moveTo(nodes[i].x + nodes[i].r + 4, nodes[i].y); ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r + 4, 0, 6.2832); }
+          ctx.fill();
+        }
+        ctx.fillStyle = 'rgba(' + col + ',' + (0.85 * k).toFixed(3) + ')';
+        ctx.beginPath();
+        for (i = 0; i < nodes.length; i++) if (!!nodes[i].g === !!pass) { ctx.moveTo(nodes[i].x + nodes[i].r, nodes[i].y); ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, 6.2832); }
+        ctx.fill();
+      }
+
+      // little "data packets" travelling along links (switched off on slower phones)
+      if (!reduce && level < 2 && t > nextPacket && packets.length < 3) {
+        nextPacket = t + 900 + Math.random() * 900;
+        var s = nodes[(Math.random() * nodes.length) | 0], best = null;
+        for (j = 0; j < nodes.length; j++) {
+          m = nodes[j]; if (m === s) continue;
+          dx = s.x - m.x; dy = s.y - m.y;
+          if (dx * dx + dy * dy < l2 && Math.random() < 0.5) { best = m; break; }
+        }
+        if (best) packets.push({ a: s, b: best, p: 0, v: 0.6 + Math.random() * 0.6 });
+      }
+      for (i = packets.length - 1; i >= 0; i--) {
+        var pk = packets[i];
+        pk.p += pk.v * dt;
+        dx = pk.a.x - pk.b.x; dy = pk.a.y - pk.b.y;
+        if (pk.p >= 1 || dx * dx + dy * dy > l2 * 1.7) { packets.splice(i, 1); continue; }
+        var px = pk.a.x + (pk.b.x - pk.a.x) * pk.p, py = pk.a.y + (pk.b.y - pk.a.y) * pk.p;
+        ctx.fillStyle = 'rgba(' + cB + ',' + (0.18 * k).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(px, py, 6, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = 'rgba(' + cB + ',' + (0.95 * k).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(px, py, 2.2, 0, 6.2832); ctx.fill();
+      }
+    }
+
+    // Self-tuning: if the phone is struggling, use fewer dots, then a lower frame rate, then stop moving.
+    function govern(cost) {
+      emaCost = emaCost ? emaCost * 0.9 + cost * 0.1 : cost;
+      if (++frames % 45 !== 0) return;
+      if (emaCost > 12) { stopped = true; stop(); draw(0, 0); return; }
+      if (emaCost > 6) {
+        if (level < 2) { level++; resize(); emaCost = 0; }
+        else if (gap < 50) { gap = 50; emaCost = 0; }
+      }
+    }
+
+    function step(t) {
+      raf = requestAnimationFrame(step);
+      if (scrolling || paused) { last = t; return; }  // keep scrolling and pop-ups buttery: no redraw meanwhile
+      if (t - last < gap) return;
+      var dt = Math.min((t - last) / 1000, 0.1);
+      last = t;
+      var t0 = performance.now();
+      draw(dt, t);
+      govern(performance.now() - t0);
+    }
+    function start() { if (!raf && !reduce && !stopped && !paused) { last = performance.now(); raf = requestAnimationFrame(step); } }
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+    window.addEventListener('scroll', function () {
+      scrolling = true; clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () { scrolling = false; }, 160);
+    }, { passive: true, capture: true });
+
+    window.addEventListener('touchmove', function () {
+      scrolling = true; clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () { scrolling = false; }, 160);
+    }, { passive: true, capture: true });
+
+    var rt;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 120); });
+    document.addEventListener('visibilitychange', function () { if (document.hidden) stop(); else start(); });
+    bgControl.pause = function () { paused = true; };
+    bgControl.resume = function () { paused = false; last = performance.now(); start(); };
+    resize();
+    start();
+  }
+  if(document.body)initBackground();else document.addEventListener('DOMContentLoaded',initBackground);
+})();
+</script>
+</body></html>
