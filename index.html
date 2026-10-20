@@ -444,6 +444,13 @@ button:active{
 .cs-toast.show{opacity:1;visibility:visible;transform:translate(-50%,0);transition-delay:0s}
 @keyframes csPulse{0%{box-shadow:0 0 0 0 rgba(255,196,0,.5)}100%{box-shadow:0 0 0 9px rgba(255,196,0,0)}}
 @media(prefers-reduced-motion:reduce){.cs-field,.cs-seg button,.cs-gstat i,.cs-toast{transition:none!important;animation:none!important}}
+/* spacing fixes in the install-guard sheet */
+#csGuideGuard .cs-row{margin:10px 0 16px}
+#csGuideGuard pre{margin:0 0 18px}
+#csGuideGuard details{margin:6px 0 18px;padding:12px 14px;border:1px solid #1d334a;border-radius:12px;background:#0a1a2a}
+#csGuideGuard details summary{font-size:14px;color:#00d9ff}
+#csGuideGuard details[open] summary{margin-bottom:6px}
+#csStep2>.cs-row{margin-top:18px}
 </style>
 <div class="cs-bar" id="csBar">
   <span class="cs-ico"><svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="29" cy="30" r="17" stroke="#00d9ff" stroke-width="3"/><ellipse cx="29" cy="30" rx="7.5" ry="17" stroke="#00d9ff" stroke-width="3"/><path d="M12 30h34M15 20h28M15 40h28" stroke="#00d9ff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><path d="M47 33l10 4v8c0 6-4 10-10 12-6-2-10-6-10-12v-8l10-4z" fill="#031a12" stroke="#00ff9d" stroke-width="2.6" stroke-linejoin="round"/><path d="M42.5 45l3.2 3.2 5.3-6" stroke="#00ff9d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
