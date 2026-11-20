@@ -9,7 +9,8 @@
 body{margin:0;background:#020914;color:#f5f7fa;font-family:Segoe UI,Arial,sans-serif}
 .wrap{max-width:850px;margin:auto;padding:0 20px 50px}
 .top{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid #17283a}
-.logo{font-size:27px;font-weight:800}
+.cs-home,.cs-home:visited,.cs-home:hover,.cs-home:active{text-decoration:none;color:inherit}
+.logo{font-size:27px;font-weight:800;color:#fff}
 .logo span{color:#00ff9d}
 .small{color:#7f8da0;font-size:13px}
 .hero{text-align:center;padding:45px 10px 30px}
@@ -126,10 +127,6 @@ input[type=email]{flex:1;min-width:220px;padding:14px;border-radius:10px;border:
 
     <div class="risk-row" id="riskRow" style="display:none">
         <div class="risk-box">
-            <div class="risk-num" id="riskScore">-</div>
-            <div class="risk-label">RISK SCORE</div>
-        </div>
-        <div class="risk-box">
             <div class="risk-num" id="breachCount">-</div>
             <div class="risk-label">BREACHES FOUND</div>
         </div>
@@ -215,11 +212,57 @@ function showError(message){
     errorBox.className = "error-box show";
 }
 
+function esc(v){
+    return String(v == null ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+async function getFrom(kind, email){
+    const url = kind === "quick"
+        ? "https://api.xposedornot.com/v1/check-email/" + encodeURIComponent(email)
+        : "https://api.xposedornot.com/v1/breach-analytics?email=" + encodeURIComponent(email);
+    const ctl = new AbortController();
+    const killer = setTimeout(function(){ ctl.abort(); }, 20000);
+    try{
+        const r = await fetch(url, {signal: ctl.signal});
+        let data = null;
+        try{ data = JSON.parse(await r.text()); }catch(e){ data = null; }
+        return {status: r.status, data: data, error: ""};
+    }catch(e){
+        return {status: 0, data: null, error: (e && e.name === "AbortError") ? "timeout" : "network"};
+    }finally{
+        clearTimeout(killer);
+    }
+}
+
+function isNotFound(r){
+    return r.status === 404 && r.data && (r.data.Error || r.data.error);
+}
+
+function fromQuick(d){
+    const names = [].concat.apply([], d.breaches || []).filter(Boolean);
+    return {
+        ExposedBreaches: {breaches_details: names.map(function(n){
+            return {breach: String(n), details: "", xposed_data: "", xposed_date: "", xposed_records: 0};
+        })},
+        PastesSummary: {cnt: 0}
+    };
+}
+
+function failMessage(r){
+    if(r.status === 429) return "The free breach service reached its limit (about 25 checks per hour on one internet connection). Please try again in an hour.";
+    if(r.status === 403) return "The breach service refused this request (403). Try again later or use another network.";
+    if(r.status >= 500) return "The breach database is having problems right now (status " + r.status + "). Try again in a few minutes.";
+    if(r.status === 0 && r.error === "timeout") return "The lookup took too long. Check your connection and try again.";
+    if(r.status === 0) return "Could not reach the breach database. Check your internet connection and try again.";
+    return "The breach database sent an unexpected answer (status " + r.status + "). Please try again.";
+}
+
 async function checkBreach(){
 
     const email = emailInput.value.trim();
 
     if(!isValidEmail(email)){
+        resetUI();
         showError("Please enter a valid email address.");
         return;
     }
@@ -229,27 +272,21 @@ async function checkBreach(){
     checkBtn.disabled = true;
 
     try{
+        const r = await getFrom("analytics", email);
 
-        const response = await fetch(
-            "https://api.xposedornot.com/v1/breach-analytics?email=" + encodeURIComponent(email)
-        );
+        if(r.status === 200 && r.data){ renderResult(r.data, false); return; }
+        if(isNotFound(r)){ renderResult({}, false); return; }
 
-        if(!response.ok && response.status !== 404){
-            throw new Error("The breach database did not respond correctly (status " + response.status + ").");
-        }
+        // Full details failed (limit, server problem, blocked): try the quick list, it has its own limit.
+        const q = await getFrom("quick", email);
+        if(q.status === 200 && q.data && q.data.breaches){ renderResult(fromQuick(q.data), true); return; }
+        if(isNotFound(q) && r.status !== 429){ renderResult({}, false); return; }
 
-        const data = await response.json();
-
-        renderResult(data);
+        showError(failMessage(r));
 
     }catch(err){
-
-        showError(
-            "Couldn't reach the breach database. Check your internet connection and try again. (" + err.message + ")"
-        );
-
+        showError("Something went wrong while checking. Please try again.");
     }finally{
-
         loadingBox.className = "loading";
         checkBtn.disabled = false;
     }
@@ -275,7 +312,7 @@ function animateCount(el, target, duration){
     requestAnimationFrame(step);
 }
 
-function renderResult(data){
+function renderResult(data, quickMode){
 
     resultBox.className = "result show";
 
@@ -309,7 +346,8 @@ function renderResult(data){
     statusHero.className = "status-hero exposed";
     statusIcon.innerHTML = ICON_EXPOSED;
     statusTitle.textContent = "This Email Was Exposed";
-    statusSubtitle.textContent = "Found in " + data.ExposedBreaches.breaches_details.length + " known breach(es). Review the details below.";
+    statusSubtitle.textContent = "Found in " + data.ExposedBreaches.breaches_details.length + " known breach(es). Change the passwords of these accounts and turn on two-step login."
+        + (quickMode ? " Detailed info is unavailable right now, so only the list of breaches is shown." : "");
 
     renderPasteMonitor(data);
 
@@ -317,29 +355,6 @@ function renderResult(data){
     riskRow.classList.remove("show-anim");
     void riskRow.offsetWidth;
     riskRow.classList.add("show-anim");
-
-    let riskLabel = "Unknown";
-    let riskScoreValue = "-";
-    let riskClass = "medium";
-
-    if(data.BreachMetrics && data.BreachMetrics.risk && data.BreachMetrics.risk[0]){
-        riskLabel = data.BreachMetrics.risk[0].risk_label || "Unknown";
-        riskScoreValue = data.BreachMetrics.risk[0].risk_score;
-
-        if(riskLabel.toLowerCase() === "low") riskClass = "low";
-        else if(riskLabel.toLowerCase() === "high") riskClass = "high";
-        else riskClass = "medium";
-    }
-
-    const riskScoreEl = document.getElementById("riskScore");
-    riskScoreEl.className = "risk-num " + riskClass;
-
-    const numericRisk = parseInt(riskScoreValue, 10);
-    if(!isNaN(numericRisk)){
-        animateCount(riskScoreEl, numericRisk, 700);
-    }else{
-        riskScoreEl.textContent = riskScoreValue;
-    }
 
     const breachCountEl = document.getElementById("breachCount");
     animateCount(breachCountEl, data.ExposedBreaches.breaches_details.length, 500);
@@ -353,16 +368,20 @@ function renderResult(data){
         const exposedTags = (breach.xposed_data || "")
             .split(";")
             .filter(Boolean)
-            .map(function(tag){ return '<span class="tag">' + tag + '</span>'; })
+            .map(function(tag){ return '<span class="tag">' + esc(tag) + '</span>'; })
             .join("");
+
+        const meta = [];
+        if(breach.xposed_date) meta.push(esc(breach.xposed_date));
+        if(breach.xposed_records) meta.push(esc(Number(breach.xposed_records).toLocaleString()) + " records");
 
         item.innerHTML =
             '<div class="breach-head">' +
-                '<span class="breach-name">' + (breach.breach || "Unknown") + '</span>' +
-                '<span class="breach-year">' + (breach.xposed_date || "") + ' • ' + (breach.xposed_records ? breach.xposed_records.toLocaleString() + ' records' : '') + '</span>' +
+                '<span class="breach-name">' + esc(breach.breach || "Unknown") + '</span>' +
+                '<span class="breach-year">' + meta.join(" • ") + '</span>' +
             '</div>' +
-            '<div class="breach-desc">' + (breach.details || "") + '</div>' +
-            '<div class="breach-tags">' + exposedTags + '</div>';
+            (breach.details ? '<div class="breach-desc">' + esc(breach.details) + '</div>' : "") +
+            (exposedTags ? '<div class="breach-tags">' + exposedTags + '</div>' : "");
 
         breachList.appendChild(item);
     });
@@ -411,12 +430,12 @@ function renderPasteMonitor(data){
 
         const source = paste.source || paste.id || paste.title || "Unknown paste source";
         const date = paste.date || paste.xposed_date || "";
-        const emailNote = paste.email ? '<div class="breach-desc">Email listed: ' + paste.email + '</div>' : "";
+        const emailNote = paste.email ? '<div class="breach-desc">Email listed: ' + esc(paste.email) + '</div>' : "";
 
         item.innerHTML =
             '<div class="breach-head">' +
-                '<span class="breach-name">' + source + '</span>' +
-                '<span class="breach-year">' + date + '</span>' +
+                '<span class="breach-name">' + esc(source) + '</span>' +
+                '<span class="breach-year">' + esc(date) + '</span>' +
             '</div>' +
             emailNote;
 
