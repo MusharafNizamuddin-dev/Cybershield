@@ -2,6 +2,7 @@
 
 <html>
 <head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,interactive-widget=resizes-content">
 <title>CyberShield</title><style>
 *{box-sizing:border-box}
@@ -706,29 +707,50 @@ Open RATGuard
 .ps-dl{margin-top:22px}
 .ps-apk{display:inline-flex;align-items:center;gap:10px;margin-top:0;padding:15px 28px;font-size:16px}
 .ps-note{color:#ffb86b;font-size:13px;min-height:18px;margin-top:10px}
-.ps-intro{color:#9eacbf;font-size:14px;margin:0 0 18px;max-width:640px}
-.ps-card .ps-shots{display:flex;gap:10px;justify-content:center;margin-top:16px;width:100%}
-.ps-shot{position:relative;flex:1;max-width:150px;aspect-ratio:9/19;border:1px solid #1d334a;border-radius:16px;background:#020914;overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
-.ps-shots:not(.two) .ps-shot{max-width:220px}
-.ps-shot:has(img){aspect-ratio:auto;display:block}
-.ps-shot img{display:block;width:100%;height:auto}
-.ps-shot span{position:relative;z-index:1;color:#5f6d80;font-size:11px;padding:0 6px 14px;text-align:center}
-.ps-shot img+span{display:none}
-.ps-card .ps-cap{font-size:12px;color:#7f8da0;margin:12px 0 0;flex-grow:0}
-</style><div class="tool-section" id="phone-tools"><h2 class="tool-heading">Phone Tools</h2><p class="ps-intro">These tools need real phone access, so they only run in the Android app. Here they are on a real phone.</p><div class="grid">
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="10" width="36" height="44" rx="6" stroke="#00d9ff" stroke-width="3"/><path d="M32 22l9 4v8c0 6-4 10-9 12-5-2-9-6-9-12v-8z" stroke="#00ff9d" stroke-width="3" stroke-linejoin="round"/></svg></div><h2>Tap Shield</h2><p>Detects tapjacking, when a hidden screen tricks you into tapping something dangerous.</p></div>
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="24" r="9" stroke="#00d9ff" stroke-width="3"/><path d="M14 52c2-11 10-16 18-16s16 5 18 16" stroke="#00ff9d" stroke-width="3" stroke-linecap="round"/></svg></div><h2>Guardian Alert</h2><p>Sends a warning to a trusted family member when the phone shows risky activity.</p></div>
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="20" stroke="#00d9ff" stroke-width="3"/><path d="M12 32h40M32 12c8 6 8 34 0 40M32 12c-8 6-8 34 0 40" stroke="#00ff9d" stroke-width="2.5"/></svg></div><h2>DNS Firewall</h2><p>Blocks ads, trackers, malware and phishing websites for the whole phone.</p></div>
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 22h32l-3 28H19z" stroke="#00d9ff" stroke-width="3" stroke-linejoin="round"/><path d="M20 22c0-6 5-10 12-10s12 4 12 10" stroke="#00ff9d" stroke-width="3"/></svg></div><h2>Honeypot Vault</h2><p>Plants decoy files in Downloads. Any app that touches them is flagged as scanning malware.</p></div>
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="28" cy="28" r="14" stroke="#00d9ff" stroke-width="3"/><path d="M38 38l14 14" stroke="#00ff9d" stroke-width="3.5" stroke-linecap="round"/></svg></div><h2>Phone Scan</h2><p>A quick security scan of the phone that checks installed apps and settings.</p></div>
-<div class="card ps-card" data-glow><div class="icon"><svg width="42" height="42" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36 8L20 34h11l-3 22 16-26H33z" stroke="#00ff9d" stroke-width="3" stroke-linejoin="round"/></svg></div><h2>Charger Guard</h2><p>Tells you if a USB port is power only or connected to a computer, and alerts you when your phone plugs into one.</p></div>
-</div></div><script>
-(function(){
-var a=document.getElementById("psApk"),n=document.getElementById("psNote");
-if(a&&a.getAttribute("href")==="YOUR_APK_LINK_HERE"){
-a.addEventListener("click",function(e){e.preventDefault();n.textContent="The APK link is not added yet.";});
-}})();
-</script><footer>CyberShield Web Edition — Learn. Analyze. Stay Secure.
+.app-tools{max-width:1050px;margin:35px auto 0;padding:0 20px}
+.app-tools ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:10px}
+.app-tools li{display:flex;align-items:center;gap:14px;padding:12px 14px;background:#071321;border:1px solid #193047;border-radius:16px}
+.app-tools i{flex:none;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#081a29;border:1px solid rgba(0,217,255,.35);border-radius:14px}
+.app-tools i svg{width:28px;height:28px}
+.app-tools b{display:block;font-size:15px;color:#f5f7fa}
+.app-tools span{display:block;font-size:13px;line-height:1.45;color:#9eacbf;margin-top:2px}
+@media(min-width:700px){.app-tools ul{grid-template-columns:repeat(2,1fr)}}
+
+/* ================= LIQUID CRYSTAL (cyan only, same look as Website Protection) ================= */
+.grid,.app-tools ul{
+  position:relative;
+  background:none;
+  border:1px solid rgba(0,217,255,.10);
+  border-radius:26px;
+  padding:14px;
+  box-shadow:none;
+}
+.app-tools ul{padding:12px}
+.grid .card,.app-tools li,.cs-bar{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(0,217,255,.10),rgba(0,217,255,0) 60%),rgba(7,19,33,.10);
+  border:1px solid rgba(0,217,255,.42);
+  box-shadow:0 0 16px rgba(0,217,255,.12),0 12px 30px rgba(0,0,0,.25);
+}
+.cs-bar.live{border-color:rgba(0,255,157,.45)}
+.grid .card::before,.app-tools li::before,.cs-bar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(170px circle at var(--gx,30%) var(--gy,0%),rgba(0,217,255,.10),transparent 65%);
+}
+.grid .card>*,.app-tools li>*,.cs-bar>*{position:relative;z-index:1}
+.app-tools i{background:rgba(8,26,41,.3);border-color:rgba(0,217,255,.4)}
+</style><div class="app-tools" id="app-tools"><h2 class="tool-heading">In the Android App</h2><ul>
+<li><i><svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M32 7L52 15V30C52 43 44 52 32 57C20 52 12 43 12 30V15L32 7Z" fill="#081a29" stroke="#00d9ff" stroke-width="3" stroke-linejoin="round"/><g transform="translate(32 33) scale(1.35) translate(-32 -33)"><path d="M27.500 36.500a5 5 0 0 1 0-7l3-3a5 5 0 0 1 7 0" stroke="#00ff9d" stroke-width="2.600" stroke-linecap="round"/><path d="M36.500 29.500a5 5 0 0 1 0 7l-3 3a5 5 0 0 1-7 0" stroke="#00ff9d" stroke-width="2.600" stroke-linecap="round"/></g></svg></i><div><b>Link Shield</b><span>Automatically detect URLs from incoming notifications.</span></div></li>
+<li><i><svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="29" cy="30" r="17" stroke="#00d9ff" stroke-width="3"/><ellipse cx="29" cy="30" rx="7.5" ry="17" stroke="#00d9ff" stroke-width="3"/><path d="M12 30h34M15 20h28M15 40h28" stroke="#00d9ff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/><path d="M47 33l10 4v8c0 6-4 10-10 12-6-2-10-6-10-12v-8l10-4z" fill="#031a12" stroke="#00ff9d" stroke-width="2.6" stroke-linejoin="round"/><path d="M42.5 45l3.2 3.2 5.3-6" stroke="#00ff9d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></i><div><b>Website Protection</b><span>Connect your site to add rate limiting against abusive traffic.</span></div></li>
+<li><i><svg aria-hidden="true" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M32 8L12 16V30C12 43 20 53 32 58C44 53 52 43 52 30V16L32 8Z" fill="#081a29" stroke="#00d9ff" stroke-width="3.5" stroke-linejoin="round"/><path d="M22 32L29 39L43 24" stroke="#00ff9d" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></i><div><b>Phone Scan</b><span>Check your settings and apps for security risks.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"> <path d="M32 7L12 15V29C12 42 20 52 32 57C44 52 52 42 52 29V15L32 7Z" fill="#081a29" stroke="#00d9ff" stroke-width="3"/> <path d="M32 20V35" stroke="#00ff9d" stroke-width="4" stroke-linecap="round"/> <circle cx="32" cy="44" r="2.5" fill="#00ff9d"/> <path d="M21 11L16 5M43 11L48 5" stroke="#00ff9d" stroke-width="2.5" stroke-linecap="round"/> </svg></i><div><b>Guardian Alert</b><span>Review Guardian safety controls and alert settings.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"> <circle cx="32" cy="32" r="22" stroke="#00d9ff" stroke-width="3"></circle> <circle cx="32" cy="32" fill="#081a29" r="8" stroke="#00ff9d" stroke-width="2.5"></circle> <path d="M32 6V14" stroke="#00d9ff" stroke-linecap="round" stroke-width="2.5"></path> <path d="M32 50V58" stroke="#00d9ff" stroke-linecap="round" stroke-width="2.5"></path> <path d="M6 32H14" stroke="#00d9ff" stroke-linecap="round" stroke-width="2.5"></path> <path d="M50 32H58" stroke="#00d9ff" stroke-linecap="round" stroke-width="2.5"></path> </svg></i><div><b>Tap Shield</b><span>Detects tapjacking and rates every app that can draw over your screen.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"> <path d="M32 7L52 15V30C52 43 44 52 32 57C20 52 12 43 12 30V15L32 7Z" stroke="#00d9ff" stroke-linejoin="round" stroke-width="3"></path> <path d="M22 32H42M32 22C28 27 28 37 32 42M32 22C36 27 36 37 32 42" stroke="#00ff9d" stroke-linecap="round" stroke-width="2.5"></path> </svg></i><div><b>DNS Firewall</b><span>Blocks ads, trackers, malware and phishing domains in every app.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 7L52 15V30C52 43 44 52 32 57C20 52 12 43 12 30V15L32 7Z" stroke="#00d9ff" stroke-linejoin="round" stroke-width="3"></path><circle cx="32" cy="27" r="5" stroke="#00ff9d" stroke-width="2.5"></circle><path d="M22 43C23 37 27 34.5 32 34.5C37 34.5 41 37 42 43" stroke="#00ff9d" stroke-linecap="round" stroke-width="2.5"></path></svg></i><div><b>Elders Mode</b><span>A family member turns on the right protections once. The elder sees one big, simple screen.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M16 22H48L51 54H13L16 22Z" stroke="#00d9ff" stroke-linejoin="round" stroke-width="3"></path><path d="M24 22V18C24 13.600 27.600 10 32 10C36.400 10 40 13.600 40 18V22" stroke="#00d9ff" stroke-linecap="round" stroke-width="3"></path><path d="M25 38L30 43L40 32" stroke="#00ff9d" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></i><div><b>Seller Check</b><span>Check if buyers reported an Instagram or WhatsApp seller before you pay.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M32 7L51 14V29C51 42 43 51 32 57C21 51 13 42 13 29V14L32 7Z" stroke="#00d9ff" stroke-linejoin="round" stroke-width="3"></path><circle cx="32" cy="27" fill="none" r="7" stroke="#00ff9d" stroke-width="2.5"></circle><path d="M32 23V27L35 29" stroke="#00ff9d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path><path d="M24 40C27 43 29.500 44 32 44C34.500 44 37 43 40 40" stroke="#00d9ff" stroke-linecap="round" stroke-width="2.5"></path></svg></i><div><b>Physical Shield</b><span>Power button SOS. Press the power button a few times to alert your guardians with your live location. Also checks if a USB port is power only or a computer.</span></div></li>
+<li><i><svg aria-hidden="true" fill="none" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><ellipse cx="32" cy="46" fill="#081a29" rx="16" ry="9" stroke="#00d9ff" stroke-width="3"></ellipse><path d="M16 46V30C16 20 23 13 32 13C41 13 48 20 48 30V46" stroke="#00d9ff" stroke-linecap="round" stroke-width="3"></path><circle cx="26" cy="43" fill="#00ff9d" r="2.4"></circle><circle cx="38" cy="43" fill="#00ff9d" r="2.4"></circle><path d="M44 24L50 18" stroke="#ff4668" stroke-linecap="round" stroke-width="2.5"></path><path d="M46 30L53 28" stroke="#ff4668" stroke-linecap="round" stroke-width="2.5"></path></svg></i><div><b>Honeypot Vault</b><span>Plants decoy files in Downloads. Any app that touches them is flagged as scanning malware.</span></div></li>
+</ul></div><footer>CyberShield Web Edition — Learn. Analyze. Stay Secure.
 
 <br><br>
 
@@ -1065,6 +1087,8 @@ el.style.setProperty(
 
 });
 
+</script><script>
+(function(){document.querySelectorAll(".app-tools li").forEach(function(el){el.addEventListener("pointermove",function(e){var r=el.getBoundingClientRect();el.style.setProperty("--gx",(e.clientX-r.left)+"px");el.style.setProperty("--gy",(e.clientY-r.top)+"px")})})})();
 </script><script>
 (function(){
 var API="https://cybershield-api.musharafnizamuddin.workers.dev";
@@ -1476,7 +1500,7 @@ render();steps();refresh();setInterval(refresh,5000);
     function govern(cost) {
       emaCost = emaCost ? emaCost * 0.9 + cost * 0.1 : cost;
       if (++frames % 45 !== 0) return;
-      if (emaCost > 12) { stopped = true; stop(); draw(0, 0); return; }
+      if (emaCost > 12) { level = 2; gap = 66; resize(); emaCost = 0; return; }  // slow phone: go lighter, but never stop
       if (emaCost > 6) {
         if (level < 2) { level++; resize(); emaCost = 0; }
         else if (gap < 50) { gap = 50; emaCost = 0; }
@@ -1485,7 +1509,7 @@ render();steps();refresh();setInterval(refresh,5000);
 
     function step(t) {
       raf = requestAnimationFrame(step);
-      if (scrolling || paused) { last = t; return; }  // keep scrolling and pop-ups buttery: no redraw meanwhile
+      if (paused) { last = t; return; }
       if (t - last < gap) return;
       var dt = Math.min((t - last) / 1000, 0.1);
       last = t;
@@ -1496,15 +1520,7 @@ render();steps();refresh();setInterval(refresh,5000);
     function start() { if (!raf && !reduce && !stopped && !paused) { last = performance.now(); raf = requestAnimationFrame(step); } }
     function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
 
-    window.addEventListener('scroll', function () {
-      scrolling = true; clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(function () { scrolling = false; }, 160);
-    }, { passive: true, capture: true });
-
-    window.addEventListener('touchmove', function () {
-      scrolling = true; clearTimeout(scrollTimer);
-      scrollTimer = setTimeout(function () { scrolling = false; }, 160);
-    }, { passive: true, capture: true });
+    // Touch and scroll no longer pause the animation: it keeps running the whole time.
 
     var rt;
     window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 120); });
